@@ -229,13 +229,12 @@ static inline
 int abortboot(int bootdelay)
 {
 	int abort = 0;
-	int tested = 0;
-	int stopstr_len = 0;
-	int envstopstr_len = 0;
 
-	char c;
-	char *envstopstr;
-	char stopstr[16] = { 0 };
+#ifdef CONFIG_MENUPROMPT
+	printf(CONFIG_MENUPROMPT);
+#else
+	printf("Hit any key to stop autoboot: %2d ", bootdelay);
+#endif
 
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
     udelay(3000000);
@@ -243,21 +242,6 @@ int abortboot(int bootdelay)
 
 	if (bootdelay <= 0)
 		return abort;
-
-	/* Check value of 'bootstopkey' and just ignore it if it's over limit */
-	envstopstr = getenv("bootstopkey");
-	if (envstopstr) {
-		envstopstr_len = strlen(envstopstr);
-
-		if (envstopstr_len > 16)
-			envstopstr = NULL;
-	} else {
-		setenv ("bootstopkey", CONFIG_BOOTSTOPKEY);
-
-		envstopstr = getenv("bootstopkey");
-		envstopstr_len = strlen(envstopstr);
-	}
-
 
 #if defined CONFIG_ZERO_BOOTDELAY_CHECK
 	/*
@@ -272,78 +256,40 @@ int abortboot(int bootdelay)
 		}
 	}
 #endif
-
-#if defined(CONFIG_MENUPROMPT)
-		printf(CONFIG_MENUPROMPT, bootdelay);
-#else
-		/*
-		 * Use custom CONFIG_MENUPROMPT if bootstopkey
-		 * string contains nonprintable characters (e.g. ESC)
-		 */
-		if (envstopstr)
-			printf("Hit \"%s\" key to stop booting: %2d", envstopstr, bootdelay);
-			//printf("Please input your password to stop booting: %2d", bootdelay);
-		else
-			printf("Hit any key to stop booting: %2d", bootdelay);
-#endif
-
 	while ((bootdelay > 0) && (!abort)) {
 		int i;
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
         gl_probe_upgrade = gl_set_uip_info();
 #endif
 		--bootdelay;
+		/* delay 100 * 10ms */
+		for (i=0; !abort && i<100; ++i) {
+			if (tstc()) {	/* we got a key press	*/
+				abort  = 1;	/* don't auto boot	*/
+				bootdelay = 0;	/* no more delay	*/
+# ifdef CONFIG_MENUKEY
+				menukey = getc();
+# else
+				(void) getc();  /* consume input	*/
+# endif
 
-		/* delay 500 * 2 ms */
-		for (i = 0; i < 200; ++i, udelay(10000)) {
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
             if(gl_probe_upgrade){
                 gl_upgrade_probe();
                 gl_upgrade_listen();
             }
 #endif
-			if (!tstc() || tested)
-				continue;
-
-			/* Ignore nulls */
-			c = getc();
-			if (c == 0)
-				continue;
-
-			/* Interrupt by any key if bootstopkey isn't used */
-			if (!envstopstr) {
-				abort = 1;
-				bootdelay = 0;
 				break;
 			}
+			udelay(10000);
+		}
 
-			/* Consume characters up to the strlen(envstopstr) */
-			if (stopstr_len < envstopstr_len)
-				stopstr[stopstr_len++] = c;
+		printf("\b\b\b%2d ", bootdelay);
 
-			/* for debug */
-			if (stopstr_len == strlen("gl")) {
-				if (strncmp(stopstr, "gl", strlen("gl")) == 0) {
-					abort = 1;
-					bootdelay = 0;
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
                     gl_probe_upgrade = 0;
 #endif
-					break;		
-				}
-			}
 
-			if (stopstr_len == envstopstr_len) {
-
-				if (memcmp(envstopstr, stopstr, envstopstr_len) == 0) {
-					abort = 1;
-					bootdelay = 0;
-					break;
-				} else
-					tested = 1;
-			}
-		}
-		printf("\b\b%2d", bootdelay);
 	}
 	puts("\n\n");
 
@@ -366,8 +312,8 @@ int abortboot(int bootdelay)
 # endif	/* CONFIG_AUTOBOOT_KEYED */
 #endif	/* CONFIG_BOOTDELAY >= 0  */
 
-
 /****************************************************************************/
+
 void main_loop (void)
 {
 #ifndef CONFIG_SYS_HUSH_PARSER
@@ -576,6 +522,9 @@ void main_loop (void)
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 		gpio_set_value(GPIO_AP1300_POWER_LED, 1);
+		break;
+	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+		gpio_set_value(GPIO_AP4220_POWER_LED, 1);
 		break;
 	default:
 		break;
@@ -1627,6 +1576,7 @@ int run_command(const char *cmd, int flag)
 int do_run_origin (cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 {
 	int i;
+
 	if (argc < 2)
 		return CMD_RET_USAGE;
 
