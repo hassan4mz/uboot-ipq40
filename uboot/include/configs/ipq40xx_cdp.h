@@ -191,7 +191,7 @@ typedef struct {
 #define CONFIG_SYS_CACHELINE_SIZE	64
 
 /* CMDS */
-#define	CONFIG_CMD_RUN
+#define CONFIG_CMD_RUN
 
 /*
  * NAND Flash Configs
@@ -269,13 +269,13 @@ typedef struct {
 #define CONFIG_IPADDR	192.168.1.1
 #define CONFIG_SERVERIP	192.168.1.2
 #define CONFIG_IPQ_NO_MACS	2
-#define CONFIG_BOOTSTOPKEY	"gl"
-
+/* #define CONFIG_BOOTSTOPKEY	"gl" */
+#define CONFIG_CMD_TFTPPUT
 /*
  * CRASH DUMP ENABLE
  */
 
-#define CONFIG_QCA_APPSBL_DLOAD	1
+//#define CONFIG_QCA_APPSBL_DLOAD	1
 
 #ifdef CONFIG_QCA_APPSBL_DLOAD
 #define CONFIG_CMD_TFTPPUT
@@ -303,6 +303,12 @@ typedef struct {
 #define CONFIG_SYS_MMC_ENV_DEV  0
 #endif
 
+#define CONFIG_AUTO_COMPLETE		1
+#define CONFIG_SYS_LONGHELP
+#define CONFIG_LZMA
+#define CONFIG_QCOM_WATCHDOG
+#define CONFIG_CMD_MISC
+#define CONFIG_CMD_BOOTD
 
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
