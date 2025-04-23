@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<title>U-Boot 更新</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<div id="m">
+			<div id="nav">
+				<a href="index.html" class="nav-button">固件更新</a>
+				<a href="art.html" class="nav-button">ART更新</a>
+				<a href="uboot.html" class="nav-button active">U-Boot更新</a>
+			</div>
+			<div id="content">
+				<div class="content-wrapper">
+					<h1>U-Boot更新</h1>
+					<p>您将要更新此设备<strong>U-Boot引导程序</strong>。<br>请从本地选择要更新的路由器U-Boot文件并点击<strong>更新 U-Boot</strong>按钮。</p>
+					<form method="post" enctype="multipart/form-data">
+						<div class="form-row">
+							<input type="file" name="uboot" id="uboot-file">
+							<input type="submit" value="更新U-Boot" class="submit-btn" disabled>
+						</div>
+					</form>
+					<div class="i w">
+						<strong>温馨提示：</strong>
+						<ul>
+							<li>请勿在更新过程中断开路由器电源；</li>
+							<li>如果更新成功，设备将自动重启；</li>
+							<li>请确认所选的U-Boot文件是正确的；</li>
+							<li>更新U-Boot是一个十分危险的操作，可能导致您的路由器无法启动。</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="f">
+			您可以在以下链接中了解本项目的更多信息：<br>
+			<a href="https://github.com/pepe2k/u-boot_mod" target="_blank">GitHub</a><br>
+			<a href="https://github.com/1980490718/uboot-ipq40xx" target="_blank">UI支持</a><br>
+		</div>
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				const fileInput = document.getElementById('uboot-file');
+				const submitBtn = document.querySelector('.submit-btn');
+				fileInput.addEventListener('change', function () {
+					submitBtn.disabled = fileInput.files.length === 0;
+				});
+			});
+		</script>
+	</body>
+</html>
