@@ -176,6 +176,7 @@ int do_http_upgrade( const ulong size, const int upgrade_type )
 						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start, size);
 					break;
 				case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+				case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 					sprintf(cmd, "nand device 1 && nand erase 0x%x 0x%x && nand write 0x88000000 0x%x 0x%x",
 						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start, size);
 					break;

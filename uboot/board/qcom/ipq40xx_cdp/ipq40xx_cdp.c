@@ -464,6 +464,7 @@ void board_nand_init(void)
 #endif
 	if ((gboard_param->machid == MACH_TYPE_IPQ40XX_AP_DK01_1_C2) ||
 		(gboard_param->machid == MACH_TYPE_IPQ40XX_AP_DK05_1_C1) ||
+		(gboard_param->machid == MACH_TYPE_IPQ40XX_AP_DK01_AP4220) ||
 		(gboard_param->machid == MACH_TYPE_IPQ40XX_AP_DK04_1_C5)) {
 		spi_nand_init();
 	}
@@ -593,6 +594,15 @@ void light_all_led(unsigned int machid)
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(GPIO_AP1300_INET_LED));
 		mdelay(1);
 		break;
+	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+		mdelay(1);
+		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(GPIO_AP4220_POWER_LED));
+		mdelay(1);
+		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(GPIO_AP4220_2GWIFI_LED));
+		mdelay(1);
+		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(GPIO_AP4220_5GWIFI_LED));
+		mdelay(1);
+		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
 		mdelay(1);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(GPIO_B1300_POWER_LED));
@@ -644,6 +654,7 @@ int board_eth_init(bd_t *bis)
 	switch (gboard_param->machid) {
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_S1:
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 	case MACH_TYPE_IPQ40XX_AP_DK05_1_C1:
 		mdelay(1);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(62));

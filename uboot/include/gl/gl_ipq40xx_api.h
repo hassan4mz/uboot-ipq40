@@ -45,6 +45,9 @@
 /*GPIO*/
 //#define GPIO_2GWiFi_LED   3
 //#define GPIO_5GWiFi_LED   2
+#define GPIO_AP4220_POWER_LED   5 //active low
+#define GPIO_AP4220_2GWIFI_LED   3
+#define GPIO_AP4220_5GWIFI_LED   2 //active low
 #define GPIO_VAL_BTN_PRESSED	0
 #define LED_ON	1
 #define LED_OFF 0
