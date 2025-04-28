@@ -237,7 +237,7 @@ int abortboot(int bootdelay)
 #endif
 
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-    udelay(3000000);
+    udelay(1000000);
 #endif
 
 	if (bootdelay <= 0)
@@ -472,7 +472,9 @@ void main_loop (void)
 		default:
 			break;
 		}
-		udelay( 1000000 );
+		udelay( 500000 );
+
+		counter += 0.5;
 	
 		switch (gboard_param->machid) {
 		case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
@@ -491,9 +493,9 @@ void main_loop (void)
 			break;
 		}
 
-		udelay( 1000000 );
+		udelay( 500000 );
 
-		counter++;
+		counter += 0.5;
 
 		//printf("%2d second(s), %ld\n", counter, get_timer(0));
 		printf("\b\b\b\b\b\b\b\b\b\b\b\b%2d second(s)", counter);
@@ -578,7 +580,7 @@ void main_loop (void)
 #ifdef CONFIG_HTTPD
 SKIPBOOT:
 	if (g_http_update) {
-		udelay(6000000);
+		udelay(3000000);
 		HttpdLoop();
 	}
 #endif
