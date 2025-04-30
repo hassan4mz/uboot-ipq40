@@ -207,7 +207,12 @@ int do_http_upgrade( const ulong size, const int upgrade_type )
 		sprintf(cmd, "sf probe && sf erase 0x170000 0x10000 && sf write 0x88000000 0x170000 0x10000");
 		run_command(cmd, 0);
 		return 0;
+	} else if ( upgrade_type == WEBFAILSAFE_UPGRADE_TYPE_MIBIB ) {
 
+		printf( "\n\n****************************\n*      MIBIB UPGRADING     *\n* DO NOT POWER OFF DEVICE! *\n****************************\n\n" );
+		sprintf(cmd, "sf probe && sf erase 0x40000 0x20000 && sf write 0x88000000 0x40000 0x20000");
+		run_command(cmd, 0);
+		return 0;
 	} else if ( upgrade_type == WEBFAILSAFE_UPGRADE_TYPE_QSDK_FIRMWARE ) {
 
 		printf( "\n\n****************************\n*      FIRMWARE UPGRADING      *\n* DO NOT POWER OFF DEVICE! *\n****************************\n\n" );

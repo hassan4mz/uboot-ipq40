@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<title>MIBIB更新</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="m">
+		<div id="nav">
+			<a href="index.html" class="nav-button">固件更新</a>
+			<a href="art.html" class="nav-button">ART更新</a>
+			<a href="uboot.html" class="nav-button">U-BOOT更新</a>
+			<a href="mibib.html" class="nav-button active">MIBIB更新</a>
+		</div>
+		<div id="content">
+			<div class="content-wrapper">
+				<h1>MIBIB更新</h1>
+				<p>您将要更新此设备的<strong>MIBIB分区</strong>。<br>请选择对应的 MIBIB 文件并点击<strong>更新MIBIB</strong>按钮。</p>
+				<form method="post" enctype="multipart/form-data">
+					<div class="form-row">
+						<input type="file" name="mibib" id="mibib-file">
+						<input type="submit" value="更新MIBIB" class="submit-btn" disabled>
+					</div>
+				</form>
+				<div class="i w">
+					<strong>注意事项：</strong>
+					<ul>
+						<li>MIBIB 是启动分区之一，请确保文件正确无误；</li>
+						<li>更新失败可能导致设备无法启动；</li>
+						<li>更新完成后将自动重启设备。</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="f">
+		您可以在以下链接中了解本项目的更多信息：
+		<a href="https://github.com/1980490718/uboot-ipq40xx" target="_blank">UI支持</a>
+		<a href="https://github.com/pepe2k/u-boot_mod" target="_blank">GitHub</a>
+	</div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const fileInput = document.getElementById('mibib-file');
+			const submitBtn = document.querySelector('.submit-btn');
+			fileInput.addEventListener('change', function () {
+				submitBtn.disabled = fileInput.files.length === 0;
+			});
+		});
+	</script>
+</body>
+</html>

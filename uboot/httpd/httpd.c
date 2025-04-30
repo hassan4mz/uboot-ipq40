@@ -181,9 +181,20 @@ static int httpd_findandstore_firstchunk(void)
 #endif */
 #endif /* if defined(WEBFAILSAFE_DISABLE_ART_UPGRADE) */
 				} else {
+					end = (char *)strstr((char *)start, "name=\"mibib\"");
 
-					printf("## Error: input name not found!\n");
-					return(0);
+					if(end){
+#if defined(WEBFAILSAFE_DISABLE_MIBIB_UPGRADE)
+						printf("## Error: MIBIB upgrade is not allowed on this board!\n");
+						webfailsafe_upload_failed = 1;
+#else
+						printf("Upgrade type: MIBIB\n");
+						webfailsafe_upgrade_type = WEBFAILSAFE_UPGRADE_TYPE_MIBIB;
+#endif /* if defined(WEBFAILSAFE_DISABLE_MIBIB_UPGRADE) */
+					} else {
+						printf("## Error: input name not found!\n");
+						return(0);
+					}
 
 				}
 
@@ -222,6 +233,10 @@ static int httpd_findandstore_firstchunk(void)
 				} else if((webfailsafe_upgrade_type == WEBFAILSAFE_UPGRADE_TYPE_ART) && (hs->upload_total != WEBFAILSAFE_UPLOAD_ART_SIZE_IN_BYTES)){
 
 					printf("## Error: wrong file size, should be: %d bytes!\n", WEBFAILSAFE_UPLOAD_ART_SIZE_IN_BYTES);
+					webfailsafe_upload_failed = 1;
+
+				} else if((webfailsafe_upgrade_type == WEBFAILSAFE_UPGRADE_TYPE_MIBIB) && (hs->upload_total != WEBFAILSAFE_UPLOAD_MIBIB_SIZE_IN_BYTES)){
+					printf("## Error: wrong file size, should be: %d bytes!\n", WEBFAILSAFE_UPLOAD_MIBIB_SIZE_IN_BYTES);
 					webfailsafe_upload_failed = 1;
 /*
 				// firmware can't exceed: (FLASH_SIZE -  WEBFAILSAFE_UPLOAD_LIMITED_AREA_IN_BYTES)
