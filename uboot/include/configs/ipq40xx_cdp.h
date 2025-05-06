@@ -269,7 +269,7 @@ typedef struct {
 #define CONFIG_IPADDR	192.168.1.1
 #define CONFIG_SERVERIP	192.168.1.2
 #define CONFIG_IPQ_NO_MACS	2
-/* #define CONFIG_BOOTSTOPKEY	"gl" */
+
 #define CONFIG_CMD_TFTPPUT
 /*
  * CRASH DUMP ENABLE
@@ -321,8 +321,5 @@ typedef struct {
 #define CONFIG_IPQ_FDT_HIGH	0x87000000
 
 #define CONFIG_HTTPD
-//AP1300 power led flash when no firmware can boot and start httpd
-#define CONFIG_LED_FLASH_WHEN_NO_FIRMWARE
-#define CONFIG_WINDOWS_UPGRADE_SUPPORT
 
 #endif /* _IPQCDP_H */

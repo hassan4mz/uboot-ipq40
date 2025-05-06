@@ -315,9 +315,6 @@ LIBS += lib/libfdt/libfdt.o
 LIBS += api/libapi.o
 LIBS += post/libpost.o
 LIBS += test/libtest.o
-ifeq ($(CONFIG_WINDOWS_UPGRADE_SUPPORT),y)
-LIBS += uip/libuip.o
-endif
 
 ifneq ($(CONFIG_AM33XX)$(CONFIG_OMAP34XX)$(CONFIG_OMAP44XX)$(CONFIG_OMAP54XX),)
 LIBS += $(CPUDIR)/omap-common/libomap-common.o

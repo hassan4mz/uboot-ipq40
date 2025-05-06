@@ -220,14 +220,6 @@ int abortboot(int bootdelay)
 static int menukey = 0;
 #endif
 
-
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-extern char gl_set_uip_info(void);
-extern void gl_upgrade_probe(void);
-extern void gl_upgrade_listen(void);
-extern char gl_probe_upgrade;
-#endif
-
 #ifndef CONFIG_MENU
 static inline
 #endif
@@ -240,11 +232,6 @@ int abortboot(int bootdelay)
 #else
 	printf("Hit any key to stop autoboot: %2d ", bootdelay);
 #endif
-
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-    udelay(1000000);
-#endif
-
 	if (bootdelay <= 0)
 		return abort;
 
@@ -263,9 +250,7 @@ int abortboot(int bootdelay)
 #endif
 	while ((bootdelay > 0) && (!abort)) {
 		int i;
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-        gl_probe_upgrade = gl_set_uip_info();
-#endif
+
 		--bootdelay;
 		/* delay 100 * 10ms */
 		for (i=0; !abort && i<100; ++i) {
@@ -277,24 +262,12 @@ int abortboot(int bootdelay)
 # else
 				(void) getc();  /* consume input	*/
 # endif
-
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-            if(gl_probe_upgrade){
-                gl_upgrade_probe();
-                gl_upgrade_listen();
-            }
-#endif
 				break;
 			}
 			udelay(10000);
 		}
 
 		printf("\b\b\b%2d ", bootdelay);
-
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-                    gl_probe_upgrade = 0;
-#endif
-
 	}
 	puts("\n\n");
 
@@ -548,9 +521,7 @@ void main_loop (void)
 		gpio_set_value(GPIO_AP1300_POWER_LED, 1);
 #endif
 	if (bootdelay >= 0 && s && !abortboot (bootdelay)) {
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-        gl_probe_upgrade = 0;
-#endif
+
 
 #ifdef CONFIG_AUTOBOOT_KEYED
 		int prev = disable_ctrlc(1);	/* disable Control C checking */

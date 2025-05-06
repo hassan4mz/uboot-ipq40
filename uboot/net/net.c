@@ -227,9 +227,6 @@ extern IPaddr_t	NetArpWaitReplyIP;
 static int net_check_prereq(enum proto_t protocol);
 
 static int NetTryCount;
-#ifdef CONFIG_LED_FLASH_WHEN_NO_FIRMWARE
-static int led_twinkle_counter = 0;
-#endif
 
 /**********************************************************************/
 
@@ -937,181 +934,6 @@ static void receive_icmp(struct ip_udp_hdr *ip, int len,
 	}
 }
 
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-char gl_probe_upgrade=0;
-char upgrade_listen=0;
-
-static char gl_cmd_msg[5][256]={0}; 
-
-void gl_upgrade_send_msg(char *msg)
-{
-    char i = 0;
-    char msg_len=strlen(msg);
-    msg_len+=1;
-    unsigned char rep[2][42]={{ 0xff,0xff,0xff,0xff,0xff,0xff,0x14,0x6b,0x9c,0xb7,0x12,0x30,0x08,0x00,0x45,0x00,0x00,0x4d,0x00,0x01,0x00,0x00,0x40,0x01,0xb9,0x06,0xc0,0xa8,0x01,0x01,0xff,0xff,0xff,0xff,0x08,0x00,0xfa,0xb1,0x00,0x01,0x00,0x01 },{0x00 }};
-    struct eth_device *eth = eth_get_dev();
-    if(eth->state == ETH_STATE_PASSIVE){
-        bd_t *bd = gd->bd;
-        eth_init(bd);
-                
-    }
-    memcpy(rep[1],msg,msg_len);
-
-    for(i=0;i<5;i++){
-        memcpy((void*)NetTxPacket, rep, 42 + msg_len);
-        eth_send(NetTxPacket, 42 + msg_len);
-        udelay (10000);
-            
-    }
-
-
-}
-
-
-char get_crc_param(char *buf,char *result,char num)
-{
-    int i=0;
-    int cunt=-1;
-    char *start=buf;
-    int len=0;
-    while((buf[i] != '\0') && (buf[i] != '\r') && (buf[i] != '\n') ){
-        if(buf[i] == ','){
-            if(++cunt == num){
-                len = buf+i-start;
-                memcpy(result,start,len);
-                result[len]='\0';
-                return 0;
-                            
-            }
-            start=buf+i+1;
-                    
-        }
-        i++;
-            
-    }
-    if((buf[i] == '\0') && (++cunt == num)){
-        len = buf+i-start;
-        memcpy(result,start,len);
-        result[len]='\0';
-        return 0;
-            
-    }
-    return -1;
-
-}
-char gl_cmd_ret = 1;
-int gl_upgrade_cmd_handle(char *cmd)
-{
-    if(strncmp(cmd,"scan",4)==0){
-        if(upgrade_listen == 0){
-            gl_upgrade_send_msg("glroute:hello");
-            upgrade_listen = 1;
-            printf("glinet scan\n");
-        }       
-    }
-    else if(strncmp(cmd,"cmd-",4)==0){
-        int i=0;
-        for(i=0;i<5;i++){
-            if(strlen(gl_cmd_msg[i])==0){
-                strcpy(gl_cmd_msg[i],cmd+4);
-                gl_upgrade_send_msg("glroute:ok");
-                printf("\nCMD:%s\n",gl_cmd_msg[i]);
-                break;
-                            
-            }
-                    
-        }
-        if( i >= 5  )
-            gl_upgrade_send_msg("glroute:err-no_space");
-            
-    }
-    else if (strncmp(cmd,"do-",3)==0){
-            int i=0;
-            for(i=0;i<5;i++){
-                if(strlen(gl_cmd_msg[i])){
-                    printf("\nDo cmd\n");
-                    setenv("gl_do_cmd",gl_cmd_msg[i]);
-                    gl_cmd_ret=run_command("run_var gl_do_cmd", 0);
-                                
-                }
-                else{
-                    break;
-                                
-                }
-                    
-            }
-            memset(gl_cmd_msg,0,sizeof(gl_cmd_msg));
-            gl_upgrade_send_msg("glroute:ok");
-            
-    }
-    else if (strncmp(cmd,"dhcp",4)==0){
-            run_command("dhcpd start", 0);
-            gl_upgrade_send_msg("glroute:ok");
-            
-    }
-    else if (strncmp(cmd,"crc-",4)==0){
-            char str_value[16]={0};
-            ulong addr, length,raw,crc;
-            get_crc_param(cmd+4,str_value,0);
-            addr  = simple_strtoul(str_value,NULL,16);
-            get_crc_param(cmd+4,str_value,1);
-            length = simple_strtoul(str_value,NULL,16);
-            get_crc_param(cmd+4,str_value,2);
-            raw = simple_strtoul(str_value,NULL,16);
-            crc = crc32 (0, (const uchar *) addr, length);
-            printf("crc:%lx,%lx,%lx,%lx\n",addr,length,raw,crc);
-            if((crc == raw)||(gl_cmd_ret == 0)){
-                gl_cmd_ret = 1;
-                gl_upgrade_send_msg("glroute:ok");
-                gl_probe_upgrade = 0;
-                upgrade_listen = 0;
-                        
-            }
-            else{
-                char err_msg[32]={0};
-                sprintf(err_msg,"glroute:err-crc_%lx",crc);
-                gl_upgrade_send_msg(err_msg);
-                    
-            }
-                    
-    }
-
-    return 0;
-
-}
-
-void gl_upgrade_hook(volatile uchar * inpkt, int len)
-{
-    char pk_buf[2048]={0};
-    //int i=0;
-    memcpy(pk_buf, (const char *)inpkt, len);
-    //    for(i=0;i<len;i++){
-    //         printf("%d:%02X,",i,pk_buf[i]);
-    //    }
-    if(strstr(pk_buf+42,"glinet:")){
-
-        gl_upgrade_cmd_handle(pk_buf+42+7);
-            
-    }
-}
-
-void gl_upgrade_probe(void)
-{
-    eth_rx();
-
-}
-
-void gl_upgrade_listen(void)
-{
-    while(upgrade_listen && gl_probe_upgrade)
-    eth_rx();
-
-}
-
-extern char NetUipLoop;
-extern char dhcpd_end;
-#endif //CONFIG_WINDOWS_UPGRADE_SUPPORT
-
 void dev_received(volatile uchar *inpkt, int len);
 void NetReceiveHttpd(volatile uchar *inpkt, int len);
 void gpio_twinkle_value(int gpio_pin);
@@ -1129,22 +951,6 @@ NetReceive(uchar *inpkt, int len)
 	ushort cti = 0, vlanid = VLAN_NONE, myvlanid, mynvlanid;
 
 	debug_cond(DEBUG_NET_PKT, "packet received %d\n", len);
-
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-    if(gl_probe_upgrade){
-        gl_probe_upgrade = 0;
-        gl_upgrade_hook(inpkt, len);
-        gl_probe_upgrade = 1;
-        return;
-            
-    }
-
-    if(NetUipLoop) {
-        dev_received(inpkt, len);
-        return;
-            
-    }
-#endif //CONFIG_WINDOWS_UPGRADE_SUPPORT
 
 	/* Proccess browser http request */
 #ifdef CONFIG_HTTPD
@@ -1749,12 +1555,6 @@ int HttpdLoop(void)
 	int ret = -1;
 	unsigned short int ip[2];
 	struct uip_eth_addr eaddr;
-
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-    dhcpd_end = 0;
-    NetUipLoop = 0;
-#endif
-
 	NetRestarted = 0;
 	NetDevExists = 0;
 	NetTryCount = 1;
@@ -1791,20 +1591,14 @@ tryagain:
 	net_init();
 	eth_halt();
 	eth_set_current();
-#ifdef CONFIG_LED_FLASH_WHEN_NO_FIRMWARE
 	if(g_is_flashing_power_led)
 		gpio_twinkle_value(g_gpio_power_led);
-#endif
 	if (eth_init(bd) < 0) {
 		eth_halt();
-#ifdef CONFIG_LED_FLASH_WHEN_NO_FIRMWARE
 	if(g_is_flashing_power_led)
 		udelay(90000);
 	else
 		udelay(1000000);
-#else
-		udelay(1000000);
-#endif
 		goto tryagain;
 	}
 
@@ -1896,16 +1690,6 @@ restart:
 		WATCHDOG_RESET();
 #ifdef CONFIG_SHOW_ACTIVITY
 		show_activity(1);
-#endif
-#ifdef CONFIG_LED_FLASH_WHEN_NO_FIRMWARE
-		if(g_is_flashing_power_led)
-		{
-			led_twinkle_counter++;
-			if (led_twinkle_counter == 10000) {
-				gpio_twinkle_value(g_gpio_power_led);
-				led_twinkle_counter=0;
-			}
-		}
 #endif
 		/*
 		 *	Check the ethernet for a new packet.  The ethernet

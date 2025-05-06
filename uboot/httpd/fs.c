@@ -61,42 +61,37 @@ static u16_t count[FS_NUMFILES];
 
 /*-----------------------------------------------------------------------------------*/
 
-#ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-static u8_t
-fs_strcmp(const char *str1, const char *str2)
+static u8_t fs_strcmp_strict(const char *str1, const char *str2)
 {
     u8_t i;
-    for(i=0;;i++)
-    {
-        if(str1[i] !=str2[i])
+    for (i = 0; ; i++) {
+        if (str1[i] != str2[i])
             return 1;
-        else if(str1[i]=='\0')
-            return 0;  
+        else if (str1[i] == '\0')
+            return 0;
     }
 }
-#else
-static u8_t
-fs_strcmp(const char *str1, const char *str2)
+
+static u8_t fs_strcmp_lenient(const char *str1, const char *str2)
 {
-  u8_t i;
-  i = 0;
- loop:
-
-  if(str2[i] == 0 ||
-     str1[i] == '\r' || 
-     str1[i] == '\n') {
-    return 0;
-  }
-
-  if(str1[i] != str2[i]) {
-    return 1;
-  }
-
-
-  ++i;
-  goto loop;
+    u8_t i = 0;
+    while (1) {
+        if (str2[i] == 0 || str1[i] == '\r' || str1[i] == '\n') {
+            return 0;
+        }
+        if (str1[i] != str2[i]) {
+            return 1;
+        }
+        i++;
+    }
 }
-#endif
+
+static u8_t (*fs_strcmp)(const char *, const char *) = fs_strcmp_strict;
+
+void fs_set_strcmp_mode(int use_strict)
+{
+    fs_strcmp = use_strict ? fs_strcmp_strict : fs_strcmp_lenient;
+}
 
 /*-----------------------------------------------------------------------------------*/
 int
