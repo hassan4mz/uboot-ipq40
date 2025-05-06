@@ -567,6 +567,8 @@ static int ipq40xx_eth_init(struct eth_device *eth_dev, bd_t *this)
 	fal_port_duplex_t duplex;
 	char *lstatus[] = {"up", "Down"};
 	char *dp[] = {"Half", "Full"};
+	(void)lstatus;
+	(void)dp;
 	hw = &c_info->hw;
 	/*
 	 * Allocate the RX buffer

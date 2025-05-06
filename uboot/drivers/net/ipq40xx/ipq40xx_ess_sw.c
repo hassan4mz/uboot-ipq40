@@ -216,10 +216,10 @@ static void ess_dump_stats(struct ess_rx_stats *rx,
 static int ipq40xx_ess_stats(cmd_tbl_t *cmdtp, int flag,
 				int argc, char *const argv[])
 {
-	struct ess_rx_stats rx_mib;
-	struct ess_tx_stats tx_mib;
+	struct ess_rx_stats rx_mib = {0};
+	struct ess_tx_stats tx_mib = {0};
 	u32 portno;
-	unsigned long timebase;
+	//unsigned long timebase;
 
 	if (argc != 2)
 	        return CMD_RET_USAGE;
@@ -314,7 +314,7 @@ static int ipq40xx_ess_stats(cmd_tbl_t *cmdtp, int flag,
 	ipq40xx_ess_sw_rd((ess_mib(portno) |
 			ESS_PHY_RX_GOODBU_REG), &rx_mib.rx_goodbh);
 	ipq40xx_ess_sw_rd((ess_mib(portno) |
-			ESS_PHY_RX_OVERFLW_REG), rx_mib.rx_overflow);
+			ESS_PHY_RX_OVERFLW_REG), &rx_mib.rx_overflow);
 	ipq40xx_ess_sw_rd((ess_mib(portno) |
 			ESS_PHY_RX_BADBL_REG), &rx_mib.rx_badbl);
 	ipq40xx_ess_sw_rd((ess_mib(portno) |

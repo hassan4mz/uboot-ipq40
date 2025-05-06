@@ -71,6 +71,8 @@ static int led_twinkle_counter = 0;
  * This code is ported from flash_eraseall.c from Linux mtd utils by
  * Arcom Control System Ltd.
  */
+extern void gpio_twinkle_value(int gpio_num);
+extern int g_gpio_power_led;
 int nand_erase_opts(nand_info_t *meminfo, const nand_erase_options_t *opts)
 {
 	struct jffs2_unknown_node cleanmarker;

@@ -23,9 +23,9 @@ char *str = "hello";
 //#include <spi_api.h>
 
 static int arptimer = 0;
-static int  HttpdTimeoutCountMax = 3;
-static int HttpdTimeoutCount = 0;
-static ulong HttpdTimeoutMSecs = 1000;
+//static int  HttpdTimeoutCountMax = 3;
+static int HttpdTimeoutCount __attribute__((unused)) = 0;
+static ulong HttpdTimeoutMSecs __attribute__((unused)) = 1000;
 extern int	webfailsafe_is_running;
 
 #if 0
@@ -87,7 +87,7 @@ void httpd_start(void)
 }
 #endif
 
-
+extern void NetSendHttpd(void);
 void HttpdHandler( void )
 {
 	int i;
@@ -136,23 +136,11 @@ int fw_type;
 int do_http_upgrade( const ulong size, const int upgrade_type )
 {
 	char cmd[128] = {0};
-	int encrypt_update = 1;//enalbe
-#ifdef CONFIG_RSA
-	const char *s = getenv("rsa");
-	printf("s = %s\n", s);
-	if ( s != NULL ) {
-		if (strcmp(s, "disable") == 0) {
-			encrypt_update = 0;
-		} else {
-			encrypt_update = 1;
-		}
-	}
-#endif
 
 	if ( upgrade_type == WEBFAILSAFE_UPGRADE_TYPE_UBOOT ) {
 		printf( "\n\n****************************\n*     U-BOOT UPGRADING     *\n* DO NOT POWER OFF DEVICE! *\n****************************\n\n" );
 
-		sprintf(cmd, "sf probe && sf erase 0x%x 0x%x && sf write 0x88000000 0x%x 0x%x", 
+		sprintf(cmd, "sf probe && sf erase 0x%x 0x%x && sf write 0x88000000 0x%x 0x%lx", 
 			CONFIG_UBOOT_START, CONFIG_UBOOT_SIZE, CONFIG_UBOOT_START, size);
 		if(size > CONFIG_UBOOT_SIZE)
 			return 0;
@@ -172,12 +160,12 @@ int do_http_upgrade( const ulong size, const int upgrade_type )
 						printf("Firmware oversize! Not flashing.\n");
 						return 0;
 					}
-					sprintf(cmd, "sf probe && sf erase 0x%x 0x%x && sf write 0x88000000 0x%x 0x%x",
+					sprintf(cmd, "sf probe && sf erase 0x%x 0x%x && sf write 0x88000000 0x%x 0x%lx",
 						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start, size);
 					break;
 				case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 				case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
-					sprintf(cmd, "nand device 1 && nand erase 0x%x 0x%x && nand write 0x88000000 0x%x 0x%x",
+					sprintf(cmd, "nand device 1 && nand erase 0x%x 0x%x && nand write 0x88000000 0x%x 0x%lx",
 						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start, size);
 					break;
 				default:
@@ -227,6 +215,7 @@ int do_http_upgrade( const ulong size, const int upgrade_type )
 }
 
 // info about current progress of failsafe mode
+extern void gpio_set_value(int gpio_num, int value);
 int do_http_progress( const int state )
 {
 	unsigned char i = 0;

@@ -40,7 +40,6 @@ DECLARE_GLOBAL_DATA_PTR;
 #define XMK_STR(x)	#x
 #define MK_STR(x)	XMK_STR(x)
 
-#if 1
 const uchar default_environment[] = {
 #ifdef	CONFIG_BOOTARGS
 	"bootargs="	CONFIG_BOOTARGS			"\0"
@@ -133,88 +132,6 @@ const uchar default_environment[] = {
 #endif
 	"\0"
 };
-#else
-
-#define CONFIG_IPADDR 192.168.1.1
-#define CONFIG_SERVERIP 192.168.1.2
-#define CONFIG_LOADADDR 0x88000000
-#define UBOOT_NAME "uboot-gl-b1300.bin"
-#define FW_NAME "lede-ipq806x-GL-B1300-squashfs-sysupgrade.bin"
-#define QSDK_FW_NAME "lede-ipq806x-GL-B1300-squashfs-sysupgrade.bin"
-#define MACHID 8010000
-
-const uchar default_environment[] = {
-#ifdef	CONFIG_BOOTARGS
-	"bootargs="	CONFIG_BOOTARGS			"\0"
-#endif
-#ifdef	CONFIG_BOOTCOMMAND
-	"bootcmd="	CONFIG_BOOTCOMMAND		"\0"
-#endif
-#ifdef	CONFIG_RAMBOOTCOMMAND
-	"ramboot="	CONFIG_RAMBOOTCOMMAND		"\0"
-#endif
-#ifdef	CONFIG_NFSBOOTCOMMAND
-	"nfsboot="	CONFIG_NFSBOOTCOMMAND		"\0"
-#endif
-#if defined(CONFIG_BOOTDELAY) && (CONFIG_BOOTDELAY >= 0)
-	"bootdelay="	MK_STR(CONFIG_BOOTDELAY)	"\0"
-#endif
-#if defined(CONFIG_BAUDRATE) && (CONFIG_BAUDRATE >= 0)
-	"baudrate="	MK_STR(CONFIG_BAUDRATE)		"\0"
-#endif
-#ifdef	CONFIG_LOADS_ECHO
-	"loads_echo="	MK_STR(CONFIG_LOADS_ECHO)	"\0"
-#endif
-	"ipaddr="	MK_STR(CONFIG_IPADDR)		"\0"
-	"serverip="	MK_STR(CONFIG_SERVERIP)		"\0"
-#ifdef	CONFIG_GATEWAYIP
-	"gatewayip="	MK_STR(CONFIG_GATEWAYIP)	"\0"
-#endif
-#ifdef	CONFIG_NETMASK
-	"netmask="	MK_STR(CONFIG_NETMASK)		"\0"
-#endif
-#ifdef	CONFIG_HOSTNAME
-	"hostname="	MK_STR(CONFIG_HOSTNAME)		"\0"
-#endif
-#ifdef	CONFIG_BOOTFILE
-	"bootfile="	CONFIG_BOOTFILE			"\0"
-#endif
-#ifdef	CONFIG_LOADADDR
-	"loadaddr="	MK_STR(CONFIG_LOADADDR)		"\0"
-#endif
-#ifdef	CONFIG_CLOCKS_IN_MHZ
-	"clocks_in_mhz=1\0"
-#endif
-#if defined(CONFIG_PCI_BOOTDELAY) && (CONFIG_PCI_BOOTDELAY > 0)
-	"pcidelay="	MK_STR(CONFIG_PCI_BOOTDELAY)	"\0"
-#endif
-#ifdef	CONFIG_ENV_VARS_UBOOT_CONFIG
-	"arch="		CONFIG_SYS_ARCH			"\0"
-	"cpu="		CONFIG_SYS_CPU			"\0"
-	"board="	CONFIG_SYS_BOARD		"\0"
-#ifdef CONFIG_SYS_VENDOR
-	"vendor="	CONFIG_SYS_VENDOR		"\0"
-#endif
-#ifdef CONFIG_SYS_SOC
-	"soc="		CONFIG_SYS_SOC			"\0"
-#endif
-#endif
-	"stderr=serial\0"
-	"stdin=serial\0"
-	"stdout=serial\0"
-	"machid=" MK_STR(MACHID)  "\0"
-	"loadaddr=" MK_STR(CONFIG_LOADADDR)  "\0"
-	"uboot_name=" UBOOT_NAME "\0" 
-	"fw_name=" FW_NAME "\0"
-	"qsdk_fw_name=" QSDK_FW_NAME "\0"
-	"lu=if ping $serverip; then tftpboot $loadaddr $uboot_name; && sf probe && sf erase 0xf0000 0x80000 && sf write $loadaddr 0xf0000 0x80000; fi\0"
-	"lf=if ping $serverip; then tftpboot $loadaddr $fw_name; fi\0"
-	"lc=if ping $serverip; then tftpboot $loadaddr $uboot_name; fi\0"
-	"lfq=if ping $serverip; then tftpboot $loadaddr $qsdk_fw_name; && imgaddr=$loadaddr && source $imgaddr:script; fi\0"
-	"\0"
-};
-
-#endif
 
 struct hsearch_data env_htab;
 

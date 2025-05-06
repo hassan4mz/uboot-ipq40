@@ -310,7 +310,7 @@ static int do_spi_flash(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[
 		ret = do_spi_flash_berase(argc, argv);
 	else
 		ret = -1;
-	
+
 done:
 	if (ret != -1)
 		return ret;
@@ -320,7 +320,7 @@ usage:
 }
 
 U_BOOT_CMD(
-	sf,	5,	0,	do_spi_flash,
+	sf,	5,	1,	do_spi_flash,
 	"SPI flash sub-system",
 	"probe [[bus:]cs] [hz] [mode]	- init flash device on given SPI bus\n"
 	"				  and chip select\n"

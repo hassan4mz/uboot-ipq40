@@ -11,7 +11,7 @@
 #define _DEBUG	0
 #endif
 
-#define CHECK_ART_REGION
+//#define CHECK_ART_REGION
 //#undef CHECK_ART_REGION
 //#define CONFIG_BOOTCOUNT_LIMIT
 
@@ -27,16 +27,8 @@
 //#define CONFIG_FIRMWARE_START		(CONFIG_ART_START + CONFIG_ART_SIZE)
 //#define CONFIG_FIRMWARE_SIZE		0xE80000
 
-//#define CONFIG_RSA_PUBKEY_START 	(CONFIG_FIRMWARE_START - 0x1000) //0x17F000
-//#define CONFIG_RSA_PUBKEY_MAX_SIZE 	0x800 // 2k
-//#define CONFIG_AES_KEY_START    	(CONFIG_RSA_PUBKEY_START + CONFIG_RSA_PUBKEY_MAX_SIZE)
-//#define CONFIG_AES_KEY_MAX_SIZE 	0x80 // 128b
-
 #define GL_OK 0
 #define GL_FAILED -1
-
-#define GL_IPQ40XX_CMD_RUN
-//#undef GL_IPQ40XX_CMD_RUN
 
 #define WEBFAILSAFE_UPLOAD_RAM_ADDRESS			0x88000000
 #define WEBFAILSAFE_UPLOAD_UBOOT_SIZE_IN_BYTES		( 512 * 1024 )
@@ -106,10 +98,6 @@
 #define FW_TYPE_OPENWRT 1
 #define FW_TYPE_OPENWRT_EMMC 2
 
-extern char uboot_name[64];
-extern char openwrt_fw_name[64];
-extern char qsdk_fw_name[64];
-
 extern int openwrt_firmware_start;
 extern int openwrt_firmware_size;
 extern int g_gpio_power_led;
@@ -120,7 +108,6 @@ extern int g_gpio_led_upgrade_erase_flashing;
 extern int g_is_flashing_power_led;
 extern int g_is_power_led_active_low;
 extern int dos_boot_part_lba_start, dos_boot_part_size, dos_third_part_lba_start;
-void gl_names_init();
+void gl_names_init(void);
 
-int do_flash (cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[]);
 #endif

@@ -279,8 +279,10 @@ static int do_boot_signedimg(cmd_tbl_t *cmdtp, int flag, int argc, char *const a
 		if (run_command(runcmd, 0) != CMD_RET_SUCCESS)
 			return CMD_RET_FAILURE;
 
+#ifdef CONFIG_CMD_UBI
 		kernel_img_info.kernel_load_size =
 			(unsigned int)ubi_get_volume_size("kernel");
+#endif
 #ifdef CONFIG_QCA_MMC
 	} else if (sfi->flash_type == SMEM_BOOT_MMC_FLASH || (gboard_param->nor_emmc_available == 1)) {
 		blk_dev = mmc_get_dev(host->dev_num);
@@ -357,6 +359,7 @@ static int do_boot_signedimg(cmd_tbl_t *cmdtp, int flag, int argc, char *const a
 	return CMD_RET_SUCCESS;
 }
 
+extern void LED_BOOTING(void);
 static int do_boot_unsignedimg(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 {
 #ifdef CONFIG_QCA_APPSBL_DLOAD

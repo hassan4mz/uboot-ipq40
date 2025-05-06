@@ -192,7 +192,7 @@ typedef struct {
 
 /* CMDS */
 #define CONFIG_CMD_RUN
-
+#define CONFIG_CMD_HTTPD 1
 /*
  * NAND Flash Configs
  */
@@ -316,7 +316,7 @@ typedef struct {
 
 #define CONFIG_RBTREE		/* for ubi */
 #define CONFIG_CMD_UBI
-#define CONFIG_BOOTCOMMAND	"bootipq; ping 192.168.1.2; run lfq; bootipq; run httpd; reset"
+#define CONFIG_BOOTCOMMAND	"bootipq"
 #define CONFIG_BOOTDELAY	2
 #define CONFIG_IPQ_FDT_HIGH	0x87000000
 

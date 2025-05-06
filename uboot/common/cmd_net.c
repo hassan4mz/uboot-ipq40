@@ -27,14 +27,12 @@
 #include <common.h>
 #include <command.h>
 #include <net.h>
-#include <gl_config.h>
 #include "gl/gl_ipq40xx_api.h"
 
 extern int TftpdownloadStatus;
-extern int gl_CurrentStatus;
 
 static int netboot_common(enum proto_t, cmd_tbl_t *, int, char * const []);
-/*
+
 int do_bootp (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	return netboot_common (BOOTP, cmdtp, argc, argv);
@@ -45,15 +43,10 @@ U_BOOT_CMD(
 	"boot image via network using BOOTP/TFTP protocol",
 	"[loadAddress] [[hostIPaddr:]bootfilename]"
 );
-*/
 
 int do_tftpb (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	int ret;
-
-#ifdef CONFIG_RSA
-	gl_CurrentStatus = CONFIG_STATUS_DOWNLOAD_FW;
-#endif
 
 	bootstage_mark_name(BOOTSTAGE_KERNELREAD_START, "tftp_start");
 	ret = netboot_common(TFTPGET, cmdtp, argc, argv);
@@ -62,7 +55,7 @@ int do_tftpb (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 }
 
 U_BOOT_CMD(
-	tftpboot,	3,	0,	do_tftpb,
+	tftpboot,	3,	1,	do_tftpb,
 	"boot image via network using TFTP protocol",
 	"[loadAddress] [[hostIPaddr:]bootfilename]"
 );
@@ -77,7 +70,7 @@ int do_tftpput(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 }
 
 U_BOOT_CMD(
-	tftpput,	4,	0,	do_tftpput,
+	tftpput,	4,	1,	do_tftpput,
 	"TFTP put command, for uploading files to a server",
 	"Address Size [[hostIPaddr:]filename]"
 );

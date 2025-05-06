@@ -20,6 +20,7 @@
 *.bin
 *.patch
 *.cfgtmp
+*.log
 
 # host programs on Cygwin
 *.exe

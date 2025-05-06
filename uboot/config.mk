@@ -22,7 +22,6 @@
 #
 
 #########################################################################
-CONFIG_RSA := n
 
 ifeq ($(CURDIR),$(SRCTREE))
 dir :=
@@ -129,12 +128,14 @@ endif
 # cc-version
 # Usage gcc-ver := $(call cc-version)
 cc-version = $(shell $(SHELL) $(SRCTREE)/tools/gcc-version.sh $(CC))
-
+bfd_ld_exist = $(shell if $(CROSS_COMPILE)ld.bfd -v > /dev/null 2>&1; \
+		then echo "$(1)"; \
+		else echo "$(2)"; fi;)
 #
 # Include the make variables (CC, etc...)
 #
 AS	= $(CROSS_COMPILE)as
-LD	= $(CROSS_COMPILE)ld
+LD     = $(call bfd_ld_exist, "$(CROSS_COMPILE)ld.bfd", "$(CROSS_COMPILE)ld")
 CC	= $(CROSS_COMPILE)gcc
 CPP	= $(CC) -E
 AR	= $(CROSS_COMPILE)ar
@@ -311,19 +312,23 @@ ALL_CFLAGS = $(CFLAGS) $(CFLAGS_$(BCURDIR)/$(@F)) $(CFLAGS_$(BCURDIR))
 EXTRA_CPPFLAGS = $(CPPFLAGS_$(BCURDIR)/$(@F)) $(CPPFLAGS_$(BCURDIR))
 ALL_CFLAGS += $(EXTRA_CPPFLAGS)
 
-#RED=\e[1;31;40m
-#GRN=\e[1;32;40m
-#YLW=\e[1;33;40m
-#CYN=\e[1;36;40m
-#NRM=\e[0m
+RED=\e[1;31;40m
+GRN=\e[1;32;40m
+YLW=\e[1;33;40m
+CYN=\e[1;36;40m
+NRM=\e[0m
 
 ifeq ($(verbose),)
 define compile
+	echo -e "$(CYN)$(firstword $1)$(GRN) $(subst $(TOPDIR)/,,$(abspath $<))$(RED)"
 	$1
+	echo -ne "$(NRM)"
 endef
 else
 define compile
+	echo -e "$(CYN)$1$(RED)"
 	$1
+	echo -ne "$(NRM)"
 endef
 endif
 

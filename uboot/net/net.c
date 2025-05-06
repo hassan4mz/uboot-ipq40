@@ -113,7 +113,6 @@
 #include "addrspace.h"
 #endif
 
-
 DECLARE_GLOBAL_DATA_PTR;
 
 /** BOOTP EXTENTIONS **/
@@ -1060,7 +1059,7 @@ int gl_upgrade_cmd_handle(char *cmd)
             get_crc_param(cmd+4,str_value,2);
             raw = simple_strtoul(str_value,NULL,16);
             crc = crc32 (0, (const uchar *) addr, length);
-            printf("crc:%x,%x,%x,%x\n",addr,length,raw,crc);
+            printf("crc:%lx,%lx,%lx,%lx\n",addr,length,raw,crc);
             if((crc == raw)||(gl_cmd_ret == 0)){
                 gl_cmd_ret = 1;
                 gl_upgrade_send_msg("glroute:ok");
@@ -1070,7 +1069,7 @@ int gl_upgrade_cmd_handle(char *cmd)
             }
             else{
                 char err_msg[32]={0};
-                sprintf(err_msg,"glroute:err-crc_%x",crc);
+                sprintf(err_msg,"glroute:err-crc_%lx",crc);
                 gl_upgrade_send_msg(err_msg);
                     
             }
@@ -1113,7 +1112,9 @@ extern char NetUipLoop;
 extern char dhcpd_end;
 #endif //CONFIG_WINDOWS_UPGRADE_SUPPORT
 
-
+void dev_received(volatile uchar *inpkt, int len);
+void NetReceiveHttpd(volatile uchar *inpkt, int len);
+void gpio_twinkle_value(int gpio_pin);
 void
 NetReceive(uchar *inpkt, int len)
 {
@@ -1323,7 +1324,7 @@ NetReceive(uchar *inpkt, int len)
 			return;
 		} else if (ip->ip_p != IPPROTO_UDP) {	/* Only UDP packets */
 			return;
-		} 
+		}
 
 		debug_cond(DEBUG_DEV_PKT,
 			"received UDP (to=%pI4, from=%pI4, len=%d)\n",
@@ -1742,11 +1743,10 @@ void NetReceiveHttpd( volatile uchar * inpkt, int len )
  *
  ***************************************/
 
-int HttpdLoop()
+int HttpdLoop(void)
 {
 	bd_t *bd = gd->bd;
 	int ret = -1;
-	uip_ipaddr_t ipaddr;
 	unsigned short int ip[2];
 	struct uip_eth_addr eaddr;
 
@@ -1863,16 +1863,18 @@ restart:
 	uip_setethaddr( eaddr );
 
 	
-	IPaddr_t tmp_ip_addr = ntohl( bd->bi_ip_addr );
-	printf( "HTTP server is starting at IP: %ld.%ld.%ld.%ld\n", 
-		( tmp_ip_addr & 0xff000000 ) >> 24, ( tmp_ip_addr & 0x00ff0000 ) >> 16, 
-		( tmp_ip_addr & 0x0000ff00 ) >> 8, ( tmp_ip_addr & 0x000000ff ) );
+	IPaddr_t tmp_ip_addr = ntohl(bd->bi_ip_addr);
+	printf("HTTP server is starting at IP: %d.%d.%d.%d\n",
+		(int)((tmp_ip_addr >> 24) & 0xff),
+		(int)((tmp_ip_addr >> 16) & 0xff),
+		(int)((tmp_ip_addr >> 8) & 0xff),
+		(int)(tmp_ip_addr & 0xff));
 
 	/*set local host ip address*/
-	ip[0] = htons( ( tmp_ip_addr & 0xFFFF0000 ) >> 16 );
-	ip[1] = htons( tmp_ip_addr & 0x0000FFFF );
+	ip[0] = htons((tmp_ip_addr & 0xFFFF0000) >> 16);
+	ip[1] = htons(tmp_ip_addr & 0x0000FFFF);
 
-	uip_sethostaddr( ip );
+	uip_sethostaddr(ip);
 
 	/*set network mask (255.255.255.0 -> local network)*/
 	ip[0] = htons( ( ( 0xFFFFFF00 & 0xFFFF0000 ) >> 16 ) );

@@ -44,7 +44,7 @@ static int spi_flash_read_write(struct spi_slave *spi,
 {
 	unsigned long flags = SPI_XFER_BEGIN;
 	int ret;
-	
+
 	if (data_len == 0)
 		flags |= SPI_XFER_END;
 

@@ -46,11 +46,16 @@
 #include "gl/gl_ipq40xx_api.h"
 #include "ipq40xx_cdp.h"
 
+/* declarations near the top with other extern declarations */
+extern void LED_INIT(void);
+extern int gpio_get_value(int gpio);
+extern void gpio_set_value(int gpio, int value);
+extern void HttpdLoop(void);
+
 #if defined(CONFIG_SILENT_CONSOLE) || defined(CONFIG_POST) || \
 	defined(CONFIG_CMDLINE_EDITING) || defined(CONFIG_IPQ_ETH_INIT_DEFER)
 DECLARE_GLOBAL_DATA_PTR;
 #endif
-
 
 /*
  * Board-specific Platform code can reimplement show_boot_progress () if needed
@@ -217,9 +222,9 @@ static int menukey = 0;
 
 
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
-extern char gl_set_uip_info();
-extern void gl_upgrade_probe();
-extern void gl_upgrade_listen();
+extern char gl_set_uip_info(void);
+extern void gl_upgrade_probe(void);
+extern void gl_upgrade_listen(void);
 extern char gl_probe_upgrade;
 #endif
 
@@ -428,6 +433,8 @@ void main_loop (void)
 	int counter = 0;
 	LED_INIT();
 #ifdef CONFIG_HTTPD
+	int ret = -1;
+	(void)ret;
 	counter = 0;
 	/*http download*/
 	int gpio_reset_btn=0;
@@ -473,8 +480,6 @@ void main_loop (void)
 			break;
 		}
 		udelay( 500000 );
-
-		counter += 0.5;
 	
 		switch (gboard_param->machid) {
 		case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
@@ -495,7 +500,7 @@ void main_loop (void)
 
 		udelay( 500000 );
 
-		counter += 0.5;
+		counter++;
 
 		//printf("%2d second(s), %ld\n", counter, get_timer(0));
 		printf("\b\b\b\b\b\b\b\b\b\b\b\b%2d second(s)", counter);
@@ -535,7 +540,7 @@ void main_loop (void)
 		g_http_update = 1;
 		goto SKIPBOOT;
 
-	} else if ((counter <= 3) && (counter > 0)) {
+	} else if ((counter <= 1) && (counter > 0)) {
 		printf( "\n\nCaution: reset button wasn't held long enough!\nContinuing normal boot...\n\n" );
 	} else {
 	}
@@ -545,20 +550,6 @@ void main_loop (void)
 	if (bootdelay >= 0 && s && !abortboot (bootdelay)) {
 #ifdef CONFIG_WINDOWS_UPGRADE_SUPPORT
         gl_probe_upgrade = 0;
-#endif
-
-#ifdef CHECK_ART_REGION
-		/*tftp download*/
-		if (!find_calibration_data()) {
-			if (!check_test() && !check_config()) {
-				int tftp_upgrade_en;
-				char *tmp;
-				tmp = getenv("tftp_upgrade");
-				tftp_upgrade_en = tmp ? (int)simple_strtol(tmp, NULL, 10) : 0;
-				if(tftp_upgrade_en==1)
-				auto_update_by_tftp();
-			}
-		}
 #endif
 
 #ifdef CONFIG_AUTOBOOT_KEYED
@@ -1574,8 +1565,8 @@ int run_command(const char *cmd, int flag)
 
 /****************************************************************************/
 
-#if (defined(CONFIG_CMD_RUN))
-int do_run_origin (cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+#if defined(CONFIG_CMD_RUN)
+int do_run (cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 {
 	int i;
 

@@ -506,4 +506,3 @@ U_BOOT_CMD(
 	"pci write[.b, .w, .l] b.d.f address value\n"
 	"    - write to CFG address"
 );
-

@@ -39,6 +39,7 @@ extern int webfailsafe_ready_for_upgrade;
 extern int webfailsafe_upgrade_type;
 extern ulong NetBootFileXferSize;
 extern unsigned char *webfailsafe_data_pointer;
+extern void gpio_twinkle_value(int gpio_num);
 
 extern void wan_led_toggle(void);
 
@@ -73,6 +74,7 @@ static int atoi(const char *s){
 }
 
 // print downloading progress
+extern void NetSendHttpd(void);
 static void httpd_download_progress( void ){
 	if ( post_packet_counter == 39 ) {
 		puts( "\n         " );
@@ -269,7 +271,7 @@ static int httpd_findandstore_firstchunk(void)
 
 	return(0);
 }
-
+extern void gpio_set_value(int gpio_num, int value);
 void httpd_appcall(void)
 {
 	struct fs_file fsfile;
@@ -622,7 +624,7 @@ void httpd_appcall(void)
 						webfailsafe_post_done = 1;
 						
 						NetBootFileXferSize = (ulong)hs->upload_total;
-						printf("NetBootFileXferSize = %d\n", NetBootFileXferSize);
+						printf("NetBootFileXferSize = %lu\n", NetBootFileXferSize);
 
 						// which website will be returned
 						if(!webfailsafe_upload_failed){

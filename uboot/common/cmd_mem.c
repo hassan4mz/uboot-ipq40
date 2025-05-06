@@ -34,7 +34,6 @@
 #endif
 #include <watchdog.h>
 
-
 static int mod_mem(cmd_tbl_t *, int, int, int, char * const []);
 
 /* Display values from last command.
@@ -351,7 +350,6 @@ int do_mem_cp ( cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	}
 
 #ifndef CONFIG_SYS_NO_FLASH
-
 	/* check if we are copying to Flash */
 	if ( (addr2info(dest) != NULL)
 #ifdef CONFIG_HAS_DATAFLASH

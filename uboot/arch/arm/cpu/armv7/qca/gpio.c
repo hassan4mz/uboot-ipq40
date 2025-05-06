@@ -113,6 +113,3 @@ void gpio_twinkle_value(unsigned int gpio_type)
 		gpio_set_value(gpio_type, 0);
 	}
 }
-
-
-

@@ -24,7 +24,6 @@
 #include <common.h>
 #include <command.h>
 
-
 int do_test(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	char * const *ap;
@@ -172,4 +171,3 @@ U_BOOT_CMD(
 	"do nothing, successfully",
 	NULL
 );
-

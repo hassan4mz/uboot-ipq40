@@ -20,7 +20,7 @@ ipq40xx:
 	@cd $(BUILD_TOPDIR)/uboot/ && $(MAKECMD) ENDIANNESS=-EB V=1 all
 	@cp $(BUILD_TOPDIR)/uboot/u-boot.bin $(BUILD_TOPDIR)/bin/temp.bin
 	@cp $(BUILD_TOPDIR)/uboot/u-boot $(BUILD_TOPDIR)/bin/openwrt-ipq40xx-u-boot-stripped.elf
-	#@make show_size
+	@make show_size
 	@make stripped
 	
 

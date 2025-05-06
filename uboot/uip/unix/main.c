@@ -51,7 +51,7 @@ char  update_msg_flag = 0;
 #define NULL (void *)0
 #endif /* NULL */
 
-
+void uip_arp_timer(void);
 char
 dev_init_up(void);
 /*---------------------------------------------------------------------------*/
@@ -80,31 +80,32 @@ void send_U_G_ok(void)
 char firmware_name[16] = "0";
 char file_name_ok_flag = 0;
 char s_d_flag = 0;
-void dev_received(volatile char * inpkt, int len)
+
+void dev_received(volatile char *inpkt, int len)
 {
     char *p = NULL;
     char i = 0;
-    unsigned char dev_name[]={ 0xff,0xff,0xff,0xff,0xff,0xff,0x14,0x6b,0x9c,0xb7,0x12,0x30,0x08,0x00,0x45,0x00,0x00,0x4d,0x00,0x01,0x00,0x00,0x40,0x01,0xb9,0x06,0xc0,0xa8,0x01,0x01,0xff,0xff,0xff,0xff,0x08,0x00,0xfa,0xb1,0x00,0x01,0x00,0x01,0x67,0x6c,0x2d,0x69,0x6e,0x65,0x74,0x2d,0x6f,0x6b,0x53,0x31,0x33,0x30,0x30 };
-	memcpy(uip_buf, (const void *)inpkt, len);
-	uip_len = len;
-    if(update_msg_flag){
+    unsigned char dev_name[] = { 0xff,0xff,0xff,0xff,0xff,0xff,0x14,0x6b,0x9c,0xb7,0x12,0x30,0x08,0x00,0x45,0x00,0x00,0x4d,0x00,0x01,0x00,0x00,0x40,0x01,0xb9,0x06,0xc0,0xa8,0x01,0x01,0xff,0xff,0xff,0xff,0x08,0x00,0xfa,0xb1,0x00,0x01,0x00,0x01,0x67,0x6c,0x2d,0x69,0x6e,0x65,0x74,0x2d,0x6f,0x6b,0x53,0x31,0x33,0x30,0x30 };
+    memcpy(uip_buf, (const void *)inpkt, len);
+    uip_len = len;
+
+    if(update_msg_flag) {
         update_msg_flag = 0;
-        if(strstr(uip_buf+42,"gl_inet_U_G")){
-
-            p = strstr(uip_buf+42,"gl_inet_U_G");
-
-	        memcpy(firmware_name, (const void *)(p+13),11+4);
-            printf("file:%s\n",firmware_name);
+        if(strstr((const char*)(uip_buf+42), "gl_inet_U_G")) {
+            p = strstr((const char*)(uip_buf+42), "gl_inet_U_G");
+            memcpy(firmware_name, (const void *)(p+13), 15);
+            firmware_name[15] = '\0';
+            printf("file:%s\n", firmware_name);
             file_name_ok_flag = 1;
             s_d_flag = 0;
         }
-        else if(strstr(uip_buf+42,"gl_inet_S_D")){
+        else if(strstr((const char*)(uip_buf+42), "gl_inet_S_D")) {
             printf("rec_s_d");
-            for(i=0;i<3;i++){
-                memcpy((void *)NetTxPacket,dev_name, 57);
+            for(i=0; i<3; i++) {
+                memcpy((void *)NetTxPacket, dev_name, 57);
                 eth_send(NetTxPacket, 57);
             }
-            s_d_flag = 1 ;
+            s_d_flag = 1;
         }
         return;
     }
@@ -375,7 +376,7 @@ uip_log(char *m)
 /*---------------------------------------------------------------------------*/
 
 
-int gl_uip_command(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
+int gl_uip_command(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 {
   if(!strncmp(argv[1], "start", 6)) {
     NetUipLoop = 1;
