@@ -15,6 +15,7 @@
 #include <flash.h>
 #endif
 
+DECLARE_GLOBAL_DATA_PTR;
 #include <asm/arch-qcom-common/gpio.h>
 #include "gl/gl_ipq40xx_api.h"
 
@@ -27,7 +28,7 @@
 /* # of timeouts before giving up */
 # define TIMEOUT_COUNT	10
 #else
-# define TIMEOUT_COUNT  0
+# define TIMEOUT_COUNT  (CONFIG_NET_RETRY_COUNT * 2)
 #endif
 /* Number of "loading" hashes per line (for checking the image size) */
 #define HASHES_PER_LINE	65
@@ -73,8 +74,6 @@ static int	TftpRemotePort;
 /* The UDP port at our end */
 static int	TftpOurPort;
 static int	TftpTimeoutCount;
-static int	TftpRestartCount = 0;
-
 /* packet sequence number */
 static ulong	TftpBlock;
 /* last packet sequence number received */
@@ -131,8 +130,6 @@ static char tftp_filename[MAX_LEN];
 #else
 #define TFTP_MTU_BLOCKSIZE 1468
 #endif
-
-#define CONFIG_TFTP_RESTART_COUNT 3
 
 static unsigned short TftpBlkSize = TFTP_BLOCK_SIZE;
 static unsigned short TftpBlkSizeOption = TFTP_MTU_BLOCKSIZE;
@@ -276,7 +273,6 @@ static void restart(const char *msg)
 #endif
 	NetStartAgain();
 }
-
 
 /*
  * Check if the block number has wrapped, and update progress
@@ -442,11 +438,6 @@ static void icmp_handler(unsigned type, unsigned code, unsigned dest,
 			 IPaddr_t sip, unsigned src, uchar *pkt, unsigned len)
 {
 	if (type == ICMP_NOT_REACH && code == ICMP_NOT_REACH_PORT) {
-		/* Oh dear the other end has gone away */
-		if (++TftpRestartCount > CONFIG_TFTP_RESTART_COUNT) {
-			puts ("Starting firmware\n\n");
-			run_command("run_var bootcmd", 0);
-		}
 		//printf("TFTP server died %d\n", TftpRestartCount);
 		restart("TFTP server died");
 	}
@@ -686,7 +677,7 @@ static void
 TftpTimeout(void)
 {
 	if (++TftpTimeoutCount > TftpTimeoutCountMax) {
-		;
+		restart("Retry count exceeded");
 	} else {
 		puts("T ");
 		NetSetTimeout(TftpTimeoutMSecs, TftpTimeout);
@@ -795,7 +786,6 @@ void TftpStart(enum proto_t protocol)
 	TftpTimeoutCountMax = TftpRRQTimeoutCountMax;
 
 	NetSetTimeout(TftpTimeoutMSecs, TftpTimeout);
-	
 	net_set_udp_handler(TftpHandler);
 #ifdef CONFIG_CMD_TFTPPUT
 	net_set_icmp_handler(icmp_handler);

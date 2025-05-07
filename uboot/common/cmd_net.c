@@ -27,9 +27,6 @@
 #include <common.h>
 #include <command.h>
 #include <net.h>
-#include "gl/gl_ipq40xx_api.h"
-
-extern int TftpdownloadStatus;
 
 static int netboot_common(enum proto_t, cmd_tbl_t *, int, char * const []);
 
@@ -251,8 +248,6 @@ static int netboot_common(enum proto_t proto, cmd_tbl_t *cmdtp, int argc,
 		bootstage_error(BOOTSTAGE_ID_NET_NETLOOP_OK);
 		return 1;
 	}
-	printf("NetBootFileXferSize = %08x\n", size);
-	TftpdownloadStatus = GL_OK;	//tftp download ok
 	bootstage_mark(BOOTSTAGE_ID_NET_NETLOOP_OK);
 	
 	/* NetLoop ok, update environment */
@@ -260,7 +255,6 @@ static int netboot_common(enum proto_t proto, cmd_tbl_t *cmdtp, int argc,
 
 	/* done if no file was loaded (no errors though) */
 	if (size == 0) {
-		TftpdownloadStatus = GL_FAILED;
 		bootstage_error(BOOTSTAGE_ID_NET_LOADED);
 		return 0;
 	}

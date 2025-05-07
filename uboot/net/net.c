@@ -211,8 +211,6 @@ static ulong	timeDelta;
 /* THE transmit packet */
 uchar *NetTxPacket;
 
-int TftpdownloadStatus = GL_FAILED;
-
 #ifdef CONFIG_HTTPD
 unsigned char *webfailsafe_data_pointer = NULL;
 int	webfailsafe_is_running = 0;

@@ -98,6 +98,7 @@
 #define FW_TYPE_OPENWRT 1
 #define FW_TYPE_OPENWRT_EMMC 2
 
+#ifndef __ASSEMBLY__
 extern int openwrt_firmware_start;
 extern int openwrt_firmware_size;
 extern int g_gpio_power_led;
@@ -110,4 +111,5 @@ extern int g_is_power_led_active_low;
 extern int dos_boot_part_lba_start, dos_boot_part_size, dos_third_part_lba_start;
 void gl_names_init(void);
 
+#endif /* __ASSEMBLY__ */
 #endif
