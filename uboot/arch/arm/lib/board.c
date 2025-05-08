@@ -489,9 +489,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #if !defined(CONFIG_SYS_NO_FLASH)
 	ulong flash_size;
 #endif
-	bd_t *bd;
 
-	bd = gd->bd;
 	gd = id;
 
 	gd->flags |= GD_FLG_RELOC;	/* tell others: relocation done */
@@ -588,10 +586,6 @@ void board_init_r(gd_t *id, ulong dest_addr)
 
 	/* initialize environment */
 	env_relocate();
-
-	/* IP Address */
-	bd->bi_ip_addr = getenv_IPaddr("ipaddr");
-
 
 #if defined(CONFIG_CMD_PCI) || defined(CONFIG_PCI)
 	arm_pci_init();

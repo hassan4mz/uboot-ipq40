@@ -1655,7 +1655,7 @@ restart:
 	uip_setethaddr( eaddr );
 
 	
-	IPaddr_t tmp_ip_addr = ntohl(bd->bi_ip_addr);
+	IPaddr_t tmp_ip_addr = ntohl(NetOurIP);
 	printf("HTTP server is starting at IP: %d.%d.%d.%d\n",
 		(int)((tmp_ip_addr >> 24) & 0xff),
 		(int)((tmp_ip_addr >> 16) & 0xff),
