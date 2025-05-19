@@ -51,3 +51,4 @@ clean_all:	clean
 	@rm -f $(BUILD_TOPDIR)/bin/*.bin
 	@rm -f $(BUILD_TOPDIR)/bin/*.elf
 	@rm -f $(BUILD_TOPDIR)/bin/*.md5
+	@rm -f $(BUILD_TOPDIR)/bin/*.zip
