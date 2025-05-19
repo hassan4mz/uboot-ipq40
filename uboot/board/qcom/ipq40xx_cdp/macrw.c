@@ -45,12 +45,6 @@ static inline char my_tolower(char c) {
 	return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
 }
 
-static int isxdigit_(char c) {
-	return (c >= '0' && c <= '9') ||
-	       (c >= 'a' && c <= 'f') ||
-	       (c >= 'A' && c <= 'F');
-}
-
 static unsigned char a2x(const char c) {
 	if (c >= '0' && c <= '9') return c - '0';
 	if (c >= 'a' && c <= 'f') return 0xA + (c - 'a');
@@ -59,18 +53,24 @@ static unsigned char a2x(const char c) {
 }
 
 static int normalize_mac_string(const char *input, char *output) {
-	int i, j = 0;
-	for (i = 0; input[i] != '\0' && j < MAC_LEN_IN_BYTE * 2; i++) {
-		if (input[i] == ':' || input[i] == '-')
-			continue;
-		if (!isxdigit_(input[i]))
-			return -1;
-		output[j++] = my_tolower(input[i]);
-	}
-	if (j != MAC_LEN_IN_BYTE * 2)
-		return -1;
-	output[j] = '\0';
-	return 0;
+    int i, j = 0;
+    char c;
+    for (i = 0; input[i] != '\0' && j < 12; i++) {
+        c = input[i];
+        if (c == ':' || c == '-')
+            continue;
+        if (!((c >= '0' && c <= '9') ||
+              (c >= 'a' && c <= 'f') ||
+              (c >= 'A' && c <= 'F')))
+            return -1;
+        if (c >= 'A' && c <= 'F')
+            c = c + ('a' - 'A');
+        output[j++] = c;
+    }
+    if (j != 12)
+        return -1;
+    output[j] = '\0';
+    return 0;
 }
 
 static void copy_str_to_mac(volatile unsigned char *mac, const char *str)
@@ -144,21 +144,23 @@ static volatile unsigned char *get_mac_address_ptr(const char *interface, int *i
 	return NULL;
 }
 
-static int flash_read_mac(const char *interface) {
+char last_read_mac[32] = {0};
+
+int flash_read_mac(const char *interface) {
 	int is_wifi = 0;
 	volatile unsigned char *mac = get_mac_address_ptr(interface, &is_wifi);
 	if (!mac) {
 		printf("Error: Invalid interface '%s'\n", interface);
+		last_read_mac[0] = 0;
 		return CMD_RET_FAILURE;
 	}
-
-	printf("%s: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		interface, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-
+	snprintf(last_read_mac, sizeof(last_read_mac), "%02x:%02x:%02x:%02x:%02x:%02x",
+		mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	printf("%s: %s\n", interface, last_read_mac);
 	return CMD_RET_SUCCESS;
 }
 
-static int flash_write_mac(const char *interface, const char *mac_str) {
+int flash_write_mac(const char *interface, const char *mac_str) {
 	char clean_mac[MAX_MAC_STR_LEN];
 	int is_wifi = 0;
 	volatile unsigned char *mac = get_mac_address_ptr(interface, &is_wifi);
@@ -188,7 +190,7 @@ static int flash_write_mac(const char *interface, const char *mac_str) {
 	return CMD_RET_SUCCESS;
 }
 
-static int flash_read_all_macs(void) {
+int flash_read_all_macs(void) {
 	const mac_interface_t *p = mac_interfaces;
 	printf("Reading all MAC addresses:\n");
 	while (p->name) {
@@ -198,8 +200,19 @@ static int flash_read_all_macs(void) {
 	return CMD_RET_SUCCESS;
 }
 
-static int do_macrw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]) {
+static const char *extract_handle(int *argc, char * const argv[]) {
+	const char *handle = NULL;
+	if (*argc > 1 && strncmp(argv[*argc - 1], "handle=", 7) == 0) {
+		handle = argv[*argc - 1] + 7;
+		(*argc)--;
+	}
+	return handle;
+}
+
+int do_macrw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]) {
 	static int flash_initialized = 0;
+
+	const char *handle = extract_handle(&argc, argv);
 
 	if (!flash_initialized) {
 		if (run_command("sf probe", 0) != 0) {
@@ -214,6 +227,7 @@ static int do_macrw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]) {
 			return CMD_RET_FAILURE;
 		flash_read_all_macs();
 		printf("Type \"macrw help\" for usage.\n");
+		if(handle) printf("handle: %s\n", handle);
 		return CMD_RET_SUCCESS;
 	}
 
@@ -225,11 +239,22 @@ static int do_macrw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]) {
 	if (!strcmp(cmd, "r")) {
 		if (read_flash_art() != CMD_RET_SUCCESS)
 			return CMD_RET_FAILURE;
-		if (argc == 2) return flash_read_all_macs();
-		if (argc == 3) return flash_read_mac(argv[2]);
+		if (argc == 2) {
+			int ret = flash_read_all_macs();
+			if(handle) printf("handle: %s\n", handle);
+			return ret;
+		}
+		if (argc == 3) {
+			int ret = flash_read_mac(argv[2]);
+			if(handle) printf("handle: %s\n", handle);
+			return ret;
+		}
 	} else if (!strcmp(cmd, "w")) {
-		if (argc == 4)
-			return flash_write_mac(argv[2], argv[3]);
+		if (argc == 4) {
+			int ret = flash_write_mac(argv[2], argv[3]);
+			if(handle) printf("handle: %s\n", handle);
+			return ret;
+		}
 	}
 
 	printf("Invalid command format. Use \"macrw help\".\n");
@@ -237,12 +262,62 @@ static int do_macrw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]) {
 }
 
 U_BOOT_CMD(
-	macrw, 4, 0, do_macrw,
+	macrw, 5, 0, do_macrw,
 	"Read/write MAC addresses in ART partition",
 	"  macrw                   - Show all MAC addresses\n"
 	"  macrw r [interface]     - Read MAC address (or all)\n"
 	"  macrw w <iface> <mac>   - Write MAC address\n"
 	"  macrw help              - Show this help\n"
+	"  macrw ... handle=web    - add web handle\n"
 	"  MAC formats supported: aa:bb:cc:dd:ee:ff, aa-bb-cc-dd-ee-ff, aabbccddeeff\n"
 	"  Interfaces: eth0, eth1, wifi0, wifi1, wifi2"
 );
+
+int web_macrw_handle(int argc, char **argv) {
+    const char *action = NULL, *iface = NULL, *mac = NULL;
+    int i;
+    for (i = 0; i < argc; i++) {
+        if (strncmp(argv[i], "action=", 7) == 0)
+            action = argv[i] + 7;
+        else if (strncmp(argv[i], "iface=", 6) == 0)
+            iface = argv[i] + 6;
+        else if (strncmp(argv[i], "mac=", 4) == 0)
+            mac = argv[i] + 4;
+    }
+    if (!action || !iface) {
+        printf("Parameter error: action and iface required\n");
+        return 0;
+    }
+    static int flash_initialized = 0;
+    if (!flash_initialized) {
+        if (run_command("sf probe", 0) != 0) {
+            printf("Error: Failed to initialize SPI flash\n");
+            return 0;
+        }
+        flash_initialized = 1;
+    }
+    if (!strcmp(action, "read")) {
+        if (read_flash_art() != CMD_RET_SUCCESS) {
+            printf("Error: Failed to read ART partition\n");
+            return 0;
+        }
+        if (flash_read_mac(iface) == CMD_RET_SUCCESS) {
+            printf("%s : %s\n", iface, last_read_mac);
+        } else {
+            printf("Failed to read MAC\n");
+        }
+    } else if (!strcmp(action, "write")) {
+        if (!mac) {
+            printf("Parameter error: mac required\n");
+            return 0;
+        }
+        if (flash_write_mac(iface, mac) == CMD_RET_SUCCESS) {
+            printf("%s MAC written successfully\n", iface);
+        } else {
+            printf("Failed to write MAC\n");
+        }
+    } else {
+        printf("Unsupported action\n");
+    }
+    return 0;
+}

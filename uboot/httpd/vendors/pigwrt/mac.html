@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<title>MAC管理</title>
+	<link rel="stylesheet" href="style.css">
+	<style>
+		#mac-form{max-width:600px;margin:0 auto}
+		#mac-result-iframe{width:100%;height:60px;border:1px solid #e0e0e0;margin:20px 0;background:#f9f9f9;border-radius:4px}
+		.form-control-group{display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-bottom:20px}
+		.form-control{display:flex;flex-direction:column;align-items:center;min-width:200px}
+		.form-control label{font-size:14px;color:#555;margin-bottom:8px;font-weight:bold}
+		.form-control select,.form-control input[type="text"]{width:100%;padding:10px 12px;border-radius:4px;border:1px solid #ccc;font-size:14px;background:#fff;transition:border .3s}
+		.form-control select:focus,.form-control input:focus{border-color:#2f54eb;outline:0}
+		#mac{width:220px;text-align:center;letter-spacing:1px}
+		.mac-input-container{display:none;width:100%;margin:15px 0}
+		.submit-btn{width:160px;padding:12px;font-weight:bold;margin-top:10px}
+		@media (max-width:500px){.form-control,#mac{min-width:100%}}
+	</style>
+</head>
+<body>
+	<div id="m">
+		<div id="nav">
+			<a href="index.html" class="nav-button">固件更新</a>
+			<a href="art.html" class="nav-button">ART更新</a>
+			<a href="uboot.html" class="nav-button">U-BOOT更新</a>
+			<a href="mibib.html" class="nav-button">MIBIB更新</a>
+			<a href="mac.html" class="nav-button active">MAC管理</a>
+		</div>
+		<div id="content">
+			<div class="content-wrapper">
+				<h1>MAC管理</h1>
+				<p>此页面您可以点击选择 <strong>读取MAC</strong> 或者 <strong>修改MAC</strong> 菜单来操作MAC地址信息。</p>
+				<form id="mac-form" action="/macrw" method="post" autocomplete="off" target="mac-result-iframe">
+					<div class="form-control-group">
+						<div class="form-control">
+							<label for="action">操作类型</label>
+							<select id="action" name="action">
+								<option value="read">读取MAC</option>
+								<option value="write">修改MAC</option>
+							</select>
+						</div>
+						<div class="form-control">
+							<label for="iface">网络接口</label>
+							<select id="iface" name="iface">
+								<option value="eth0">eth0</option>
+								<option value="eth1">eth1</option>
+								<option value="wifi0">wifi0</option>
+								<option value="wifi1">wifi1</option>
+								<option value="wifi2">wifi2</option>
+							</select>
+						</div>
+					</div>
+					<div class="mac-input-container" id="mac-row">
+						<div class="form-control">
+							<label for="mac">MAC地址</label>
+							<input type="text" id="mac" name="mac" maxlength="12" pattern="[0-9a-fA-F]{12}" title="请输入12位十六进制字符（0-9, a-f）">
+						</div>
+					</div>
+					<div class="form-row">
+						<input type="submit" class="submit-btn" id="submit-btn" value="确认读取">
+					</div>
+				</form>
+				<iframe id="mac-result-iframe" name="mac-result-iframe"></iframe>
+				<div class="i w" style="margin-top:28px">
+					<strong>温馨提示：</strong>
+					<ul>
+						<li>此页面可直接读取和修改设备MAC地址，请按照接口名称操作；</li>
+						<li>MAC地址格式支持12位连续字符（如aabbccddeeff）；</li>
+						<li>修改无线MAC地址会自动校验并更新校验和数值；</li>
+						<li>若操作后无线速率异常，请重刷原厂ART并重新设置MAC地址，或者保持原厂默认MAC地址。</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="f">
+		您可以在以下链接中了解本项目的更多信息：
+		<a href="https://github.com/1980490718/uboot-ipq40xx" target="_blank">UI支持</a>
+		<a href="https://github.com/pepe2k/u-boot_mod" target="_blank">GitHub</a>
+	</div>
+	<script>
+		document.getElementById('action').onchange = function() {
+			var e = this.value === 'write';
+			document.getElementById('mac-row').style.display = e ? 'block' : 'none';
+			document.getElementById('submit-btn').value = e ? '确认修改' : '确认读取';
+			e && setTimeout(function() { document.getElementById('mac').focus() }, 100);
+		};
+	</script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			document.getElementById('action').onchange();
+		});
+	</script>
+	<script>
+		let o = !1;
+		document.getElementById('mac-form').onsubmit = function(e) {
+			if (o) return e.preventDefault(), !1;
+			if (document.getElementById('action').value === 'write') {
+				const macInput = document.getElementById('mac');
+				if (macInput) {
+					const cleanMac = macInput.value.replace(/[^a-fA-F0-9]/g, '');
+					if (cleanMac.length !== 12) {
+						alert('请输入12位有效的MAC地址字符（0-9, a-f）');
+						e.preventDefault();
+						return false;
+					}
+					const hiddenInput = document.createElement('input');
+					hiddenInput.type = 'hidden';
+					hiddenInput.name = 'mac';
+					hiddenInput.value = cleanMac;
+					this.appendChild(hiddenInput);
+					macInput.disabled = true;
+				}
+			}
+			o = !0;
+			setTimeout(function() {
+				document.getElementById('mac-result-iframe').scrollIntoView({ behavior: "smooth" });
+				o = !1;
+			}, 600);
+		};
+	</script>
+	<script>
+		document.getElementById('mac').addEventListener('input', function(e) {
+			let t = e.target.value.replace(/[^a-fA-F0-9]/g, '');
+			t = t.substr(0, 12);
+			e.target.value = t.toLowerCase();
+		});
+	</script>
+</body>
+</html>
