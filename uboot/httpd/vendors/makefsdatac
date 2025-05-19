@@ -39,7 +39,7 @@ files_counter=0
 
 # Change ASCII to bytes, comma separated (e.g. "0x01, 0x02, 0x03...")
 function ascii_to_bytes() {
-	echo -ne $1 | od -A n -t x1 | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'
+    echo -ne "$1" | hexdump -v -e '/1 "0x%02x, "' | sed 's/, $//'
 }
 
 # $1 -> file path
@@ -66,35 +66,34 @@ function print_data_array() {
 	`echo "," >> "$files_content_tmp"`
 
 	# Content
-	if [ "$_file_ext" == "css"  ]; then
-		if type -p java >/dev/null && [ -e "$yui_compressor" ]; then
-			_file_content=`java -jar "$yui_compressor" --charset utf-8 "$1" | od -A n -t x1 | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'`
-		else
-			_file_content=`cat "$1" | tr -d '\r\n\t' | od -A n -t x1 | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'`
-		fi
-		`ascii_to_bytes "Content-type: text/css; charset=UTF-8\r\n\r\n" >> "$files_content_tmp"`
-	elif [ "$_file_ext" == "png"  ]; then
-		_file_content=`od -A n -t x1 < "$1" | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'`
-		`ascii_to_bytes "Content-Type: image/png\r\n\r\n" >> "$files_content_tmp"`
-	elif [ "$_file_ext" == "jpg" -o "$_file_ext" == "jpeg"  ]; then
-		_file_content=`od -A n -t x1 < "$1" | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'`
-		`ascii_to_bytes "Content-Type: image/jpeg\r\n\r\n" >> "$files_content_tmp"`
-	elif [ "$_file_ext" == "gif"  ]; then
-		_file_content=`od -A n -t x1 < "$1" | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'`
-		`ascii_to_bytes "Content-Type: image/gif\r\n\r\n" >> "$files_content_tmp"`
-	else
-		_file_content=`cat "$1" | tr -d '\t\r\n' | od -A n -t x1 | tr -d '\r\n' | sed 's/ /0x/;s/ /, 0x/g;s/.\{102\}/&\n/g'`
-		`ascii_to_bytes "Content-type: text/html; charset=UTF-8\r\n\r\n" >> "$files_content_tmp"`
-	fi
+if [ "$_file_ext" == "css"  ]; then
+        if type -p java >/dev/null && [ -e "$yui_compressor" ]; then
+            _file_content=$(java -jar "$yui_compressor" --charset utf-8 "$1" | hexdump -v -e '/1 "0x%02x, "' | sed 's/, $//')
+        else
+            _file_content=$(cat "$1" | tr -d '\r\n\t' | hexdump -v -e '/1 "0x%02x, "' | sed 's/, $//')
+        fi
+        $(ascii_to_bytes "Content-type: text/css; charset=UTF-8\r\n\r\n" >> "$files_content_tmp")
+    elif [ "$_file_ext" == "png"  ]; then
+        _file_content=$(hexdump -v -e '/1 "0x%02x, "' "$1" | sed 's/, $//')
+        $(ascii_to_bytes "Content-Type: image/png\r\n\r\n" >> "$files_content_tmp")
+    elif [ "$_file_ext" == "jpg" -o "$_file_ext" == "jpeg"  ]; then
+        _file_content=$(hexdump -v -e '/1 "0x%02x, "' "$1" | sed 's/, $//')
+        $(ascii_to_bytes "Content-Type: image/jpeg\r\n\r\n" >> "$files_content_tmp")
+    elif [ "$_file_ext" == "gif"  ]; then
+        _file_content=$(hexdump -v -e '/1 "0x%02x, "' "$1" | sed 's/, $//')
+        $(ascii_to_bytes "Content-Type: image/gif\r\n\r\n" >> "$files_content_tmp")
+    else
+        _file_content=$(cat "$1" | tr -d '\t\r\n' | hexdump -v -e '/1 "0x%02x, "' | sed 's/, $//')
+        $(ascii_to_bytes "Content-type: text/html; charset=UTF-8\r\n\r\n" >> "$files_content_tmp")
+    fi
 
-	`echo "," >> "$files_content_tmp"`
+    echo "," >> "$files_content_tmp"
 
-	# File content
-	`echo -ne "/* Page/File content */\n" >> "$files_content_tmp"`
-	`echo -ne "$_file_content" >> "$files_content_tmp"`
+    echo "/* Page/File content */" >> "$files_content_tmp"
+    echo "$_file_content," >> "$files_content_tmp"
 
-	# And close declaration
-	`echo -ne "0 };\n\n" >> "$files_content_tmp"`
+    echo "0x00 };" >> "$files_content_tmp"
+    echo "" >> "$files_content_tmp"
 }
 
 # $1 -> file path
