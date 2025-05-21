@@ -12,7 +12,6 @@
 // ASCII characters
 #define ISO_G					0x47	// GET
 #define ISO_E					0x45
-#define ISO_T					0x54
 #define ISO_P					0x50	// POST
 #define ISO_O					0x4f
 #define ISO_S					0x53
@@ -21,7 +20,7 @@
 #define ISO_space				0x20
 #define ISO_nl					0x0a
 #define ISO_cr					0x0d
-#define ISO_tab					0x09
+#define ISO_tab				0x09
 
 // we use this so that we can do without the ctype library
 #define is_digit(c)				((c) >= '0' && (c) <= '9')
@@ -42,7 +41,7 @@ extern unsigned char *webfailsafe_data_pointer;
 extern void gpio_twinkle_value(int gpio_num);
 extern void wan_led_toggle(void);
 
-int web_macrw_handle(int argc, char **argv);
+int web_macrw_handle(int argc, char **argv, char *resp_buf, int bufsize);
 
 // http app state
 struct httpd_state *hs;
@@ -54,8 +53,8 @@ static unsigned char post_packet_counter = 0;
 static unsigned char post_line_counter = 0;
 
 // 0x0D -> CR 0x0A -> LF
-static char eol[3] = { 0x0d, 0x0a, 0x00 };
-static char eol2[5] = { 0x0d, 0x0a, 0x0d, 0x0a, 0x00 };
+static const char eol[] = "\r\n";
+static const char eol2[] = "\r\n\r\n";
 static char *boundary_value;
 
 // str to int
@@ -76,7 +75,6 @@ static int parse_url_args(char *s, int *argc, char **argv, int max_args) {
 	*argc = n;
 	return n;
 }
-
 // print downloading progress
 extern void NetSendHttpd(void);
 static void httpd_download_progress(void){
@@ -93,13 +91,11 @@ static void httpd_download_progress(void){
 	puts("#");
 	post_packet_counter++;
 }
-
 // http server init
 void httpd_init(void) {
 	fs_init();
 	uip_listen(HTONS(80));
 }
-
 // reset app state
 static void httpd_state_reset(void) {
 	hs->state = STATE_NONE;
@@ -109,12 +105,12 @@ static void httpd_state_reset(void) {
 	hs->upload_total = 0;
 	data_start_found = 0;
 	post_packet_counter = 0;
-	if(boundary_value){
-		free(boundary_value);
+	post_line_counter = 0;
+	if (boundary_value) {
+	free(boundary_value);
 		boundary_value = NULL;
 	}
 }
-
 // find and get first chunk of data
 static int httpd_findandstore_firstchunk(void) {
 	char *start = NULL;
@@ -195,7 +191,6 @@ static int httpd_findandstore_firstchunk(void) {
 	}
 	return(0);
 }
-
 extern void gpio_set_value(int gpio_num, int value);
 void httpd_appcall(void) {
 	struct fs_file fsfile;
@@ -245,9 +240,14 @@ void httpd_appcall(void) {
 							query++;
 							parse_url_args(query, &argc, argv, 10);
 						}
-						web_macrw_handle(argc, argv);
-						httpd_state_reset();
-						uip_close();
+						char resp_buf[512];
+						int resp_len = web_macrw_handle(argc, argv, resp_buf, sizeof(resp_buf));
+						hs->is_macrw_resp = 1;
+						hs->macrw_buf = (u8_t *)resp_buf;
+						hs->macrw_len = resp_len;
+						hs->dataptr = hs->macrw_buf;
+						hs->upload = hs->macrw_len;
+						uip_send(hs->dataptr, (hs->upload > uip_mss() ? uip_mss() : hs->upload));
 						return;
 					}
 				}
@@ -256,13 +256,23 @@ void httpd_appcall(void) {
 						char *body = strstr((char*)uip_appdata, "\r\n\r\n");
 						if (body) {
 							body += 4;
-							char *body_copy = strdup(body);
-							int argc = 0; char *argv[10];
+							int header_len = body - (char*)uip_appdata;
+							int body_len = uip_len - header_len;
+							char *body_copy = malloc(body_len + 1);
+							memcpy(body_copy, body, body_len);
+							body_copy[body_len] = '\0';
+							int argc = 0;
+							char *argv[10];
 							parse_url_args(body_copy, &argc, argv, 10);
-							web_macrw_handle(argc, argv);
+							char resp_buf[512];
+							int resp_len = web_macrw_handle(argc, argv, resp_buf, sizeof(resp_buf));
+							hs->is_macrw_resp = 1;
+							hs->macrw_buf = (u8_t *)resp_buf;
+							hs->macrw_len = resp_len;
+							hs->dataptr = hs->macrw_buf;
+							hs->upload = hs->macrw_len;
+							uip_send(hs->dataptr, (hs->upload > uip_mss() ? uip_mss() : hs->upload));
 							free(body_copy);
-							httpd_state_reset();
-							uip_close();
 							return;
 						}
 					}
@@ -380,6 +390,18 @@ void httpd_appcall(void) {
 				}
 			}
 			if(uip_acked()){
+				if (hs->is_macrw_resp) {
+					if (hs->upload <= uip_mss()) {
+					httpd_state_reset();
+					uip_close();
+					hs->is_macrw_resp = 0;
+					return;
+					}
+					hs->dataptr += uip_conn->len;
+					hs->upload -= uip_conn->len;
+					uip_send(hs->dataptr, (hs->upload > uip_mss() ? uip_mss() : hs->upload));
+					return;
+				}
 				if(hs->state == STATE_FILE_REQUEST){
 					if(hs->upload <= uip_mss()){
 						if(webfailsafe_post_done){

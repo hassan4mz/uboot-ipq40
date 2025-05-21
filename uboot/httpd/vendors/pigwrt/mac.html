@@ -5,17 +5,22 @@
 	<title>MAC管理</title>
 	<link rel="stylesheet" href="style.css">
 	<style>
-		#mac-form{max-width:600px;margin:0 auto}
-		#mac-result-iframe{width:100%;height:60px;border:1px solid #e0e0e0;margin:20px 0;background:#f9f9f9;border-radius:4px}
-		.form-control-group{display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-bottom:20px}
-		.form-control{display:flex;flex-direction:column;align-items:center;min-width:200px}
-		.form-control label{font-size:14px;color:#555;margin-bottom:8px;font-weight:bold}
-		.form-control select,.form-control input[type="text"]{width:100%;padding:10px 12px;border-radius:4px;border:1px solid #ccc;font-size:14px;background:#fff;transition:border .3s}
-		.form-control select:focus,.form-control input:focus{border-color:#2f54eb;outline:0}
-		#mac{width:220px;text-align:center;letter-spacing:1px}
-		.mac-input-container{display:none;width:100%;margin:15px 0}
-		.submit-btn{width:160px;padding:12px;font-weight:bold;margin-top:10px}
-		@media (max-width:500px){.form-control,#mac{min-width:100%}}
+		#mac-form { max-width: 600px; margin: 0 auto }
+		#mac-result-box { width: 100%; min-height: 60px; border: 1px solid #e0e0e0; margin: 20px 0; padding: 10px; background: #f9f9f9; border-radius: 4px; color: #333; transition: all 0.3s; }
+		.form-control-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px }
+		.form-control { display: flex; flex-direction: column; align-items: center; min-width: 200px }
+		.form-control label { font-size: 14px; color: #555; margin-bottom: 8px; font-weight: bold }
+		.form-control select, .form-control input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; transition: border .3s }
+		.form-control select:focus, .form-control input:focus { border-color: #2f54eb; outline: 0 }
+		#mac { width: 220px; text-align: center; letter-spacing: 1px }
+		.mac-input-container { display: none; width: 100%; margin: 15px 0; animation: fadeIn 0.3s; }
+		.submit-btn { width: 160px; padding: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: all 0.2s; }
+		.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+		@media (max-width: 500px) { .form-control, #mac { min-width: 100% } }
+		.loading { color: #666; font-style: italic; }
+		.error { color: #f44336 !important; background: #ffebee; }
+		.success { color: #4CAF50 !important; }
+		@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 	</style>
 </head>
 <body>
@@ -31,7 +36,7 @@
 			<div class="content-wrapper">
 				<h1>MAC管理</h1>
 				<p>此页面您可以点击选择 <strong>读取MAC</strong> 或者 <strong>修改MAC</strong> 菜单来操作MAC地址信息。</p>
-				<form id="mac-form" action="/macrw" method="post" autocomplete="off" target="mac-result-iframe">
+				<form id="mac-form" method="POST" action="/macrw">
 					<div class="form-control-group">
 						<div class="form-control">
 							<label for="action">操作类型</label>
@@ -54,14 +59,16 @@
 					<div class="mac-input-container" id="mac-row">
 						<div class="form-control">
 							<label for="mac">MAC地址</label>
-							<input type="text" id="mac" name="mac" maxlength="12" pattern="[0-9a-fA-F]{12}" title="请输入12位十六进制字符（0-9, a-f）">
+							<input type="text" id="mac" name="mac" maxlength="12"
+								pattern="[0-9a-fA-F]{12}"
+								title="请输入12位十六进制字符（0-9, a-f）">
 						</div>
 					</div>
 					<div class="form-row">
-						<input type="submit" class="submit-btn" id="submit-btn" value="确认读取">
+						<button type="button" class="submit-btn" id="submit-btn">确认读取</button>
 					</div>
 				</form>
-				<iframe id="mac-result-iframe" name="mac-result-iframe"></iframe>
+				<div id="mac-result-box"></div>
 				<div class="i w" style="margin-top:28px">
 					<strong>温馨提示：</strong>
 					<ul>
@@ -80,51 +87,100 @@
 		<a href="https://github.com/pepe2k/u-boot_mod" target="_blank">GitHub</a>
 	</div>
 	<script>
-		document.getElementById('action').onchange = function() {
-			var e = this.value === 'write';
-			document.getElementById('mac-row').style.display = e ? 'block' : 'none';
-			document.getElementById('submit-btn').value = e ? '确认修改' : '确认读取';
-			e && setTimeout(function() { document.getElementById('mac').focus() }, 100);
-		};
-	</script>
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			document.getElementById('action').onchange();
-		});
-	</script>
-	<script>
-		let o = !1;
-		document.getElementById('mac-form').onsubmit = function(e) {
-			if (o) return e.preventDefault(), !1;
-			if (document.getElementById('action').value === 'write') {
-				const macInput = document.getElementById('mac');
-				if (macInput) {
-					const cleanMac = macInput.value.replace(/[^a-fA-F0-9]/g, '');
-					if (cleanMac.length !== 12) {
-						alert('请输入12位有效的MAC地址字符（0-9, a-f）');
-						e.preventDefault();
-						return false;
-					}
-					const hiddenInput = document.createElement('input');
-					hiddenInput.type = 'hidden';
-					hiddenInput.name = 'mac';
-					hiddenInput.value = cleanMac;
-					this.appendChild(hiddenInput);
-					macInput.disabled = true;
+		(function() {
+			const actionSelect = document.getElementById('action');
+			const macRow = document.getElementById('mac-row');
+			const submitBtn = document.getElementById('submit-btn');
+			function updateUI() {
+				const isWrite = actionSelect.value === 'write';
+				macRow.style.display = isWrite ? 'block' : 'none';
+				submitBtn.textContent = isWrite ? '确认修改' : '确认读取';
+				if (isWrite) {
+					setTimeout(() => {
+						const macInput = document.getElementById('mac');
+						macInput.focus();
+						macInput.select();
+					}, 100);
 				}
 			}
-			o = !0;
-			setTimeout(function() {
-				document.getElementById('mac-result-iframe').scrollIntoView({ behavior: "smooth" });
-				o = !1;
-			}, 600);
-		};
-	</script>
-	<script>
-		document.getElementById('mac').addEventListener('input', function(e) {
-			let t = e.target.value.replace(/[^a-fA-F0-9]/g, '');
-			t = t.substr(0, 12);
-			e.target.value = t.toLowerCase();
+			actionSelect.addEventListener('change', updateUI);
+			updateUI();
+		})();
+		(function() {
+			const macInput = document.getElementById('mac');
+			macInput.addEventListener('input', function(e) {
+				let val = e.target.value.replace(/[^a-fA-F0-9]/g, '');
+				e.target.value = val.substr(0, 12).toLowerCase();
+			});
+		})();
+		(function() {
+			const submitBtn = document.getElementById('submit-btn');
+			const resultBox = document.getElementById('mac-result-box');
+			const validInterfaces = ['eth0', 'eth1', 'wifi0', 'wifi1', 'wifi2'];
+			submitBtn.addEventListener('click', async function() {
+				const action = document.getElementById('action').value;
+				const iface = document.getElementById('iface').value;
+				if (!validInterfaces.includes(iface)) {
+					resultBox.className = 'error';
+					resultBox.innerHTML = `错误：无效接口名称 '${iface}'`;
+					resultBox.scrollIntoView({ behavior: 'smooth' });
+					return;
+				}
+				if (action === 'write') {
+					const macVal = document.getElementById('mac').value.trim();
+					if (macVal.length !== 12) {
+						resultBox.className = 'error';
+						resultBox.innerHTML = '错误：请输入12位有效的MAC地址字符（0-9, a-f）';
+						resultBox.scrollIntoView({ behavior: 'smooth' });
+						return;
+					}
+				}
+				const params = new URLSearchParams();
+				params.append('action', action);
+				params.append('iface', iface);
+				if (action === 'write') {
+					params.append('mac', document.getElementById('mac').value);
+				}
+				submitBtn.disabled = true;
+				resultBox.className = 'loading';
+				resultBox.innerHTML = '正在处理请求...';
+				try {
+					const response = await fetch('/macrw', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+						},
+						body: params
+					});
+					if (!response.ok) {
+						throw new Error(`HTTP错误 ${response.status}`);
+					}
+					const text = await response.text();
+					const cleanText = text.split('\n')
+						.filter(line => !line.startsWith('HTTP/') &&
+							!line.startsWith('Content-Type:') &&
+							!line.startsWith('Connection:'))
+						.join('\n')
+						.trim();
+					if (cleanText) {
+						resultBox.className = cleanText.includes('Error') ? 'error' : 'success';
+						resultBox.innerHTML = cleanText;
+					} else {
+						resultBox.className = 'success';
+						resultBox.innerHTML = action === 'write' ? 'MAC地址修改成功' : 'MAC地址读取成功';
+					}
+				} catch (error) {
+					console.error('请求错误:', error);
+					resultBox.className = 'error';
+					resultBox.innerHTML = '请求失败: ' + error.message;
+				} finally {
+					submitBtn.disabled = false;
+					resultBox.scrollIntoView({ behavior: 'smooth' });
+				}
+			});
+		})();
+		window.addEventListener('DOMContentLoaded', function() {
+			document.getElementById('action').dispatchEvent(new Event('change'));
 		});
 	</script>
 </body>

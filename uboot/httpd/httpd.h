@@ -62,6 +62,9 @@ struct httpd_state {
 	unsigned char *dataptr;
 	unsigned int upload;
 	unsigned int upload_total;
+	unsigned char is_macrw_resp;
+	unsigned char *macrw_buf;
+	unsigned short macrw_len;
 };
 
 
