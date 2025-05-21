@@ -72,7 +72,7 @@ build_board() {
     ${STAGING_DIR}/host/bin/sstrip "$out_elf"
 
     # 生成固定大小 .bin 镜像（512 KiB，填充 0xFF）
-    local out_bin="${BUILD_TOPDIR}/bin/${board}.bin"
+    local out_bin="${BUILD_TOPDIR}/bin/${board}-u-boot.bin"
     dd if=/dev/zero bs=1k count=512 | tr '\000' '\377' > "$out_bin"
     dd if="$out_elf" of="$out_bin" conv=notrunc
     md5sum "$out_bin" > "${out_bin}.md5"
@@ -98,6 +98,8 @@ build_board() {
     local zipfile="bin/output-${board}-${timestamp}.zip"
     zip -9j "$zipfile" "$out_elf" "$out_elf.md5" "$out_bin" "$out_bin.md5" build.clean.log > /dev/null
     echo -e "${GREEN}📦 打包成功: $(basename "$zipfile")${RESET}" | tee -a "$LOGFILE"
+    # 新增：打包后自动清理上一级目录下的日志
+    rm -f "${BUILD_TOPDIR}/build.log" "${BUILD_TOPDIR}/build.clean.log"
 
     local elfsize=$(stat -c%s "$out_elf" | awk '{printf "%.1f KiB", $1/1024}')
     local elfmd5=$(md5sum "$out_elf" | awk '{print $1}')
@@ -123,7 +125,7 @@ case "$1" in
     clean)
         export BUILD_TOPDIR=$(pwd)
         echo -e "${YELLOW}===> 执行 distclean 清理...${RESET}"
-        (cd ${BUILD_TOPDIR}/uboot && ARCH=arm CROSS_COMPILE=arm-openwrt-linux- make --silent distclean)
+        (cd ${BUILD_TOPDIR}/uboot && ARCH=arm CROSS_COMPILE=arm-openwrt-linux- make --silent distclean) 2>/dev/null
         rm -f ${BUILD_TOPDIR}/uboot/httpd/fsdata.c
         rm -f ${BUILD_TOPDIR}/*.log
         echo -e "${GREEN}===> 清理完成${RESET}"
@@ -131,7 +133,7 @@ case "$1" in
     clean_all)
         export BUILD_TOPDIR=$(pwd)
         echo -e "${YELLOW}===> 执行 distclean 清理并删除产物...${RESET}"
-        (cd ${BUILD_TOPDIR}/uboot && ARCH=arm CROSS_COMPILE=arm-openwrt-linux- make --silent distclean)
+        (cd ${BUILD_TOPDIR}/uboot && ARCH=arm CROSS_COMPILE=arm-openwrt-linux- make --silent distclean) 2>/dev/null
         rm -f ${BUILD_TOPDIR}/uboot/httpd/fsdata.c
         echo "清理构建文件并删除 bin/ 产物/日志"
         rm -f ${BUILD_TOPDIR}/bin/*.bin
