@@ -77,9 +77,9 @@ int spi_flash_cmd_write(struct spi_slave *spi, const u8 *cmd, size_t cmd_len,
 		const void *data, size_t data_len, int twinkle_led)
 {
 	if ((spi_wirte_count % 500) == 0 && twinkle_led == 1) {
-		gpio_twinkle_value(g_gpio_led_upgrade_write_flashing_2);
-		if(g_gpio_led_upgrade_write_flashing_2 != g_gpio_led_upgrade_write_flashing_1)
-			gpio_twinkle_value(g_gpio_led_upgrade_write_flashing_1);
+		gpio_twinkle_value(led_upgrade_write_flashing_2);
+		if(led_upgrade_write_flashing_2 != led_upgrade_write_flashing_1)
+			gpio_twinkle_value(led_upgrade_write_flashing_1);
 		spi_wirte_count = 0;
 	}
 
@@ -100,10 +100,10 @@ int spi_flash_cmd_write_multi(struct spi_flash *flash, u32 offset,
 	byte_addr = offset % page_size;
 
 	/*sync GPIO_2GWiFi_LED and GPIO_5GWiFi_LED*/
-	gpio_set_value(g_gpio_led_upgrade_write_flashing_1, LED_OFF);
-	gpio_set_value(g_gpio_led_upgrade_write_flashing_2, LED_OFF);
-	gpio_set_value(g_gpio_led_upgrade_erase_flashing, LED_OFF);
-	gpio_set_value(g_gpio_power_led, !g_is_power_led_active_low);
+	gpio_set_value(led_upgrade_write_flashing_1, LED_OFF);
+	gpio_set_value(led_upgrade_write_flashing_2, LED_OFF);
+	gpio_set_value(led_upgrade_erase_flashing, LED_OFF);
+	gpio_set_value(power_led, !power_led_active_low);
 
 	ret = spi_claim_bus(flash->spi);
 	if (ret) {
@@ -280,8 +280,8 @@ static int spi_flash_cmd_erase_block_or_sector(struct spi_flash *flash, u8 erase
 		return ret;
 	}
 	//b1300 s1300 turn off mesh led when  flash erase
-	if(g_gpio_led_upgrade_write_flashing_1 != g_gpio_led_upgrade_write_flashing_2)
-		gpio_set_value(g_gpio_led_upgrade_write_flashing_1, LED_OFF);
+	if(led_upgrade_write_flashing_1 != led_upgrade_write_flashing_2)
+		gpio_set_value(led_upgrade_write_flashing_1, LED_OFF);
 
 	cmd[0] = erase_cmd;
 	start = offset;
@@ -289,7 +289,7 @@ static int spi_flash_cmd_erase_block_or_sector(struct spi_flash *flash, u8 erase
 
 	while (offset < end) {
 
-		gpio_twinkle_value(g_gpio_led_upgrade_erase_flashing);
+		gpio_twinkle_value(led_upgrade_erase_flashing);
 		
 		spi_flash_addr(flash, offset, cmd);
 		offset += erase_size;

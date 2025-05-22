@@ -1589,11 +1589,11 @@ tryagain:
 	net_init();
 	eth_halt();
 	eth_set_current();
-	if(g_is_flashing_power_led)
-		gpio_twinkle_value(g_gpio_power_led);
+	if(flashing_power_led)
+		gpio_twinkle_value(power_led);
 	if (eth_init(bd) < 0) {
 		eth_halt();
-	if(g_is_flashing_power_led)
+	if(flashing_power_led)
 		udelay(90000);
 	else
 		udelay(1000000);

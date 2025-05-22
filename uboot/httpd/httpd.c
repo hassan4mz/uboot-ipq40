@@ -86,7 +86,7 @@ static void httpd_download_progress(void){
 	if (post_line_counter == 10) {
 		wan_led_toggle();
 		post_line_counter = 0;
-		gpio_twinkle_value(g_gpio_led_tftp_transfer_flashing);
+		gpio_twinkle_value(led_tftp_transfer_flashing);
 	}
 	puts("#");
 	post_packet_counter++;
@@ -378,7 +378,7 @@ void httpd_appcall(void) {
 						uip_abort();
 						return;
 					} else {
-						gpio_set_value(g_gpio_power_led, !g_is_power_led_active_low);
+						gpio_set_value(power_led, !power_led_active_low);
 						printf("Data will be downloaded at 0x%X in RAM\n", WEBFAILSAFE_UPLOAD_RAM_ADDRESS);
 					}
 					if(httpd_findandstore_firstchunk()){
@@ -449,9 +449,9 @@ void httpd_appcall(void) {
 					httpd_download_progress();
 					if(hs->upload >= hs->upload_total+strlen(boundary_value)+6){
 						printf("\n\ndone!\n");
-						if(g_gpio_led_tftp_transfer_flashing!=g_gpio_power_led)
-							gpio_set_value(g_gpio_led_tftp_transfer_flashing, LED_OFF);
-						gpio_set_value(g_gpio_power_led, !g_is_power_led_active_low);
+						if(led_tftp_transfer_flashing!=power_led)
+							gpio_set_value(led_tftp_transfer_flashing, LED_OFF);
+						gpio_set_value(power_led, !power_led_active_low);
 						webfailsafe_post_done = 1;
 						NetBootFileXferSize = (ulong)hs->upload_total;
 						printf("NetBootFileXferSize = %lu\n", NetBootFileXferSize);

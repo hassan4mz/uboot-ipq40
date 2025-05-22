@@ -183,9 +183,9 @@ int do_http_progress( const int state )
 				udelay( 25000 );
 			}
 			printf( "HTTP upload is done! Upgrading...\n" );
-			if(g_gpio_led_tftp_transfer_flashing!=g_gpio_power_led)
-				gpio_set_value(g_gpio_led_tftp_transfer_flashing, LED_OFF);
-			gpio_set_value(g_gpio_power_led, !g_is_power_led_active_low);
+			if(led_tftp_transfer_flashing!=power_led)
+				gpio_set_value(led_tftp_transfer_flashing, LED_OFF);
+			gpio_set_value(power_led, !power_led_active_low);
 
 			break;
 

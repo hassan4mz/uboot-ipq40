@@ -72,7 +72,7 @@ static int led_twinkle_counter = 0;
  * Arcom Control System Ltd.
  */
 extern void gpio_twinkle_value(int gpio_num);
-extern int g_gpio_power_led;
+extern int power_led;
 int nand_erase_opts(nand_info_t *meminfo, const nand_erase_options_t *opts)
 {
 	struct jffs2_unknown_node cleanmarker;
@@ -188,7 +188,7 @@ int nand_erase_opts(nand_info_t *meminfo, const nand_erase_options_t *opts)
 			if (percent != percent_complete) {
 				led_twinkle_counter++;
 				if (led_twinkle_counter == 5) {
-					gpio_twinkle_value(g_gpio_power_led);
+					gpio_twinkle_value(power_led);
 					led_twinkle_counter=0;
 				}
 				percent_complete = percent;

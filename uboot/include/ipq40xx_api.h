@@ -91,13 +91,13 @@
 #ifndef __ASSEMBLY__
 extern int openwrt_firmware_start;
 extern int openwrt_firmware_size;
-extern int g_gpio_power_led;
-extern int g_gpio_led_tftp_transfer_flashing;
-extern int g_gpio_led_upgrade_write_flashing_1;
-extern int g_gpio_led_upgrade_write_flashing_2;
-extern int g_gpio_led_upgrade_erase_flashing;
-extern int g_is_flashing_power_led;
-extern int g_is_power_led_active_low;
+extern int power_led;
+extern int led_tftp_transfer_flashing;
+extern int led_upgrade_write_flashing_1;
+extern int led_upgrade_write_flashing_2;
+extern int led_upgrade_erase_flashing;
+extern int flashing_power_led;
+extern int power_led_active_low;
 extern int dos_boot_part_lba_start, dos_boot_part_size, dos_third_part_lba_start;
 void board_names_init(void);
 

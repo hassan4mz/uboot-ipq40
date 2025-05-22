@@ -139,13 +139,13 @@ void wan_led_toggle(void)
 
 int openwrt_firmware_start;
 int openwrt_firmware_size;
-int g_gpio_power_led;
-int g_gpio_led_tftp_transfer_flashing;
-int g_gpio_led_upgrade_write_flashing_1;
-int g_gpio_led_upgrade_write_flashing_2;
-int g_gpio_led_upgrade_erase_flashing;
-int g_is_flashing_power_led=0;
-int g_is_power_led_active_low=0;
+int power_led;
+int led_tftp_transfer_flashing;
+int led_upgrade_write_flashing_1;
+int led_upgrade_write_flashing_2;
+int led_upgrade_erase_flashing;
+int flashing_power_led=0;
+int power_led_active_low=0;
 int dos_boot_part_lba_start, dos_boot_part_size, dos_third_part_lba_start;
 
 void board_names_init()
@@ -154,52 +154,52 @@ void board_names_init()
 	case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
 		openwrt_firmware_start=0x180000;
 		openwrt_firmware_size=0xe80000;
-		g_gpio_power_led=GPIO_S1300_POWER_LED;
-		g_gpio_led_tftp_transfer_flashing=GPIO_S1300_MESH_LED;
-		g_gpio_led_upgrade_write_flashing_1=GPIO_S1300_MESH_LED;
-		g_gpio_led_upgrade_write_flashing_2=GPIO_S1300_WIFI_LED;
-		g_gpio_led_upgrade_erase_flashing=GPIO_S1300_WIFI_LED;
+		power_led=GPIO_S1300_POWER_LED;
+		led_tftp_transfer_flashing=GPIO_S1300_MESH_LED;
+		led_upgrade_write_flashing_1=GPIO_S1300_MESH_LED;
+		led_upgrade_write_flashing_2=GPIO_S1300_WIFI_LED;
+		led_upgrade_erase_flashing=GPIO_S1300_WIFI_LED;
 		get_mmc_part_info();
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK04_1_C3:
 		openwrt_firmware_start=0x180000;
 		openwrt_firmware_size=0xe80000;
-		g_gpio_power_led=GPIO_B2200_POWER_BLUE_LED;
-		g_gpio_led_tftp_transfer_flashing=GPIO_B2200_POWER_BLUE_LED;
-		g_gpio_led_upgrade_write_flashing_1=GPIO_B2200_POWER_BLUE_LED;
-		g_gpio_led_upgrade_write_flashing_2=GPIO_B2200_POWER_BLUE_LED;
-		g_gpio_led_upgrade_erase_flashing=GPIO_B2200_POWER_BLUE_LED;
-		g_is_power_led_active_low=0;
+		power_led=GPIO_B2200_POWER_BLUE_LED;
+		led_tftp_transfer_flashing=GPIO_B2200_POWER_BLUE_LED;
+		led_upgrade_write_flashing_1=GPIO_B2200_POWER_BLUE_LED;
+		led_upgrade_write_flashing_2=GPIO_B2200_POWER_BLUE_LED;
+		led_upgrade_erase_flashing=GPIO_B2200_POWER_BLUE_LED;
+		power_led_active_low=0;
 		get_mmc_part_info();
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 		openwrt_firmware_start=0x0;
 		openwrt_firmware_size=0x8000000;
-		g_gpio_power_led=GPIO_AP1300_POWER_LED;
-		g_gpio_led_tftp_transfer_flashing=GPIO_AP1300_POWER_LED;
-		g_gpio_led_upgrade_write_flashing_1=GPIO_AP1300_POWER_LED;
-		g_gpio_led_upgrade_write_flashing_2=GPIO_AP1300_POWER_LED;
-		g_gpio_led_upgrade_erase_flashing=GPIO_AP1300_POWER_LED;
-		g_is_flashing_power_led=1;
+		power_led=GPIO_AP1300_POWER_LED;
+		led_tftp_transfer_flashing=GPIO_AP1300_POWER_LED;
+		led_upgrade_write_flashing_1=GPIO_AP1300_POWER_LED;
+		led_upgrade_write_flashing_2=GPIO_AP1300_POWER_LED;
+		led_upgrade_erase_flashing=GPIO_AP1300_POWER_LED;
+		flashing_power_led=1;
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 		openwrt_firmware_start=0x0;
 		openwrt_firmware_size=0x8000000;
-		g_gpio_power_led=GPIO_AP4220_POWER_LED;
-		g_gpio_led_tftp_transfer_flashing=GPIO_AP4220_POWER_LED;
-		g_gpio_led_upgrade_write_flashing_1=GPIO_AP4220_2GWIFI_LED;
-		g_gpio_led_upgrade_write_flashing_2=GPIO_AP4220_5GWIFI_LED;
-		g_gpio_led_upgrade_erase_flashing=GPIO_AP4220_POWER_LED;
-		g_is_flashing_power_led=1;
+		power_led=GPIO_AP4220_POWER_LED;
+		led_tftp_transfer_flashing=GPIO_AP4220_POWER_LED;
+		led_upgrade_write_flashing_1=GPIO_AP4220_2GWIFI_LED;
+		led_upgrade_write_flashing_2=GPIO_AP4220_5GWIFI_LED;
+		led_upgrade_erase_flashing=GPIO_AP4220_POWER_LED;
+		flashing_power_led=1;
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
 		openwrt_firmware_start=0x180000;
 		openwrt_firmware_size=0x1e80000;
-		g_gpio_power_led=GPIO_B1300_POWER_LED;
-		g_gpio_led_tftp_transfer_flashing=GPIO_B1300_MESH_LED;
-		g_gpio_led_upgrade_write_flashing_1=GPIO_B1300_MESH_LED;
-		g_gpio_led_upgrade_write_flashing_2=GPIO_B1300_WIFI_LED;
-		g_gpio_led_upgrade_erase_flashing=GPIO_B1300_WIFI_LED;
+		power_led=GPIO_B1300_POWER_LED;
+		led_tftp_transfer_flashing=GPIO_B1300_MESH_LED;
+		led_upgrade_write_flashing_1=GPIO_B1300_MESH_LED;
+		led_upgrade_write_flashing_2=GPIO_B1300_WIFI_LED;
+		led_upgrade_erase_flashing=GPIO_B1300_WIFI_LED;
 		break;
 	default:
 		break;

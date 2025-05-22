@@ -256,7 +256,7 @@ static void show_block_marker(void)
 		else if ((TftpBlock % (10 * HASHES_PER_LINE)) == 0)
 			puts("\n\t ");
 		else if ((TftpBlock % (10 * 40)) == 0)
-			gpio_twinkle_value(g_gpio_led_tftp_transfer_flashing);
+			gpio_twinkle_value(led_tftp_transfer_flashing);
 	}
 }
 
@@ -307,8 +307,8 @@ static void tftp_complete(void)
 	}
 #endif
 	puts("\ndone\n");
-	gpio_set_value(g_gpio_led_tftp_transfer_flashing, LED_OFF);
-	gpio_set_value(g_gpio_power_led, !g_is_power_led_active_low);
+	gpio_set_value(led_tftp_transfer_flashing, LED_OFF);
+	gpio_set_value(power_led, !power_led_active_low);
 	net_set_state(NETLOOP_SUCCESS);
 }
 
