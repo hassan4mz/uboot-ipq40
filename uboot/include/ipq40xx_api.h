@@ -1,12 +1,5 @@
-/*************************************************************************
-        > File Name: gl_ipq40xx_cmd.h
-        > Author: Lancer
-        > Mail: luoyejiang0701@qq.com
-        > Created Time: 2017年08月22日 星期二 14时55分45秒
- ************************************************************************/
- 
-#ifndef GL_IPQ40XX_API_H
-#define GL_IPQ40XX_API_H
+#ifndef IPQ40XX_API_H
+#define IPQ40XX_API_H
 #ifndef DEBUG
 #define _DEBUG	0
 #endif
@@ -26,9 +19,6 @@
 
 //#define CONFIG_FIRMWARE_START		(CONFIG_ART_START + CONFIG_ART_SIZE)
 //#define CONFIG_FIRMWARE_SIZE		0xE80000
-
-#define GL_OK 0
-#define GL_FAILED -1
 
 #define WEBFAILSAFE_UPLOAD_RAM_ADDRESS			0x88000000
 #define WEBFAILSAFE_UPLOAD_UBOOT_SIZE_IN_BYTES		( 512 * 1024 )
@@ -60,7 +50,7 @@
 #define WEBFAILSAFE_UPLOAD_LIMITED_AREA_IN_BYTES	( 320 * 1024 )
 
 // progress state info
-#define WEBFAILSAFE_PROGRESS_START				0
+#define WEBFAILSAFE_PROGRESS_START			0
 #define WEBFAILSAFE_PROGRESS_TIMEOUT			1
 #define WEBFAILSAFE_PROGRESS_UPLOAD_READY		2
 #define WEBFAILSAFE_PROGRESS_UPGRADE_READY		3
@@ -68,7 +58,7 @@
 
 // update type
 #define WEBFAILSAFE_UPGRADE_TYPE_FIRMWARE		0
-#define WEBFAILSAFE_UPGRADE_TYPE_UBOOT			1
+#define WEBFAILSAFE_UPGRADE_TYPE_UBOOT		1
 #define WEBFAILSAFE_UPGRADE_TYPE_ART			2
 #define WEBFAILSAFE_UPGRADE_TYPE_QSDK_FIRMWARE	3
 #define WEBFAILSAFE_UPGRADE_TYPE_MIBIB		4
@@ -109,7 +99,7 @@ extern int g_gpio_led_upgrade_erase_flashing;
 extern int g_is_flashing_power_led;
 extern int g_is_power_led_active_low;
 extern int dos_boot_part_lba_start, dos_boot_part_size, dos_third_part_lba_start;
-void gl_names_init(void);
+void board_names_init(void);
 
 #endif /* __ASSEMBLY__ */
 #endif

@@ -1,5 +1,5 @@
 #include <common.h>
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #include <mmc.h>
 #include "ipq40xx_cdp.h"
 
@@ -148,7 +148,7 @@ int g_is_flashing_power_led=0;
 int g_is_power_led_active_low=0;
 int dos_boot_part_lba_start, dos_boot_part_size, dos_third_part_lba_start;
 
-void gl_names_init()
+void board_names_init()
 {
 	switch (gboard_param->machid) {
 	case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:

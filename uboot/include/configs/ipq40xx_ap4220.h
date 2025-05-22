@@ -6,7 +6,7 @@
 #define _IPQ40XX_AP4220_H
 
 #include <configs/ipq40xx_cdp.h>
-#include <gl/gl_ipq40xx_api.h>
+#include <ipq40xx_api.h>
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"active=1\0" \

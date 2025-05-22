@@ -34,7 +34,7 @@
 #include <command.h>
 #include <ide.h>
 #include "part_dos.h"
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 
 #if defined(CONFIG_CMD_IDE) || \
     defined(CONFIG_CMD_SATA) || \

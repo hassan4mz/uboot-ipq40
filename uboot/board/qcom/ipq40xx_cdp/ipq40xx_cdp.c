@@ -54,7 +54,7 @@
 #include <jffs2/load_kernel.h>
 #include <asm/arch-qcom-common/clk.h>
 #include <asm/arch-ipq40xx/smem.h>
-#include <gl/gl_ipq40xx_api.h>
+#include "ipq40xx_api.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -367,7 +367,6 @@ int board_early_init_f(void)
 {
 	/* Retrieve from SMEM */
 	gboard_param = get_board_param(smem_get_board_platform_type());
-	//gl_names_init();
 	return 0;
 }
 
@@ -649,7 +648,7 @@ int board_eth_init(bd_t *bis)
 	if (gpio) {
 		qca_configure_gpio(gpio, gboard_param->sw_gpio_count);
 	}
-	gl_names_init();
+	board_names_init();
 	light_all_led(gboard_param->machid);
 	switch (gboard_param->machid) {
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_S1:

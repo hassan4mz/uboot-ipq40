@@ -43,7 +43,7 @@
 #include <linux/ctype.h>
 #include <menu.h>
 
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #include "ipq40xx_cdp.h"
 
 /* declarations near the top with other extern declarations */
@@ -68,7 +68,7 @@ int update_tftp (ulong addr);
 #endif /* CONFIG_UPDATE_TFTP */
 
 #ifdef CONFIG_HTTPD
-int g_http_update = 0;
+int http_update = 0;
 #endif
 
 #define MAX_DELAY_STOP_STR 32
@@ -402,10 +402,9 @@ void main_loop (void)
 	/* eth_initialize(gd->bd); */
 	puts("\nNet:   ");
 	eth_initialize(gd->bd);
-
 	int counter = 0;
 	LED_INIT();
-#ifdef CONFIG_HTTPD
+# ifdef CONFIG_HTTPD
 	int ret = -1;
 	(void)ret;
 	counter = 0;
@@ -510,7 +509,7 @@ void main_loop (void)
 		break;
 	}
 
-		g_http_update = 1;
+		http_update = 1;
 		goto SKIPBOOT;
 
 	} else if ((counter <= 1) && (counter > 0)) {
@@ -519,13 +518,11 @@ void main_loop (void)
 	}
 	if(gboard_param->machid==MACH_TYPE_IPQ40XX_AP_DK01_1_C2)
 		gpio_set_value(GPIO_AP1300_POWER_LED, 1);
-#endif
+# endif
 	if (bootdelay >= 0 && s && !abortboot (bootdelay)) {
-
-
-#ifdef CONFIG_AUTOBOOT_KEYED
+# ifdef CONFIG_AUTOBOOT_KEYED
 		int prev = disable_ctrlc(1);	/* disable Control C checking */
-#endif
+# endif
 
 		int ret = run_command(s, 0);
 		if (ret) {
@@ -534,20 +531,20 @@ void main_loop (void)
 			do_reset( NULL, 0, 0, NULL );
 		}
 
-#ifdef CONFIG_AUTOBOOT_KEYED
+# ifdef CONFIG_AUTOBOOT_KEYED
 		disable_ctrlc(prev);	/* restore Control C checking */
-#endif
+# endif
 	}
-	
-#ifdef CONFIG_HTTPD
+
+# ifdef CONFIG_HTTPD
 SKIPBOOT:
-	if (g_http_update) {
-		udelay(3000000);
+	if (http_update) {
+		udelay(1000000);
 		HttpdLoop();
 	}
-#endif
-	
-#ifdef CONFIG_MENUKEY
+# endif
+
+# ifdef CONFIG_MENUKEY
 	if (menukey == CONFIG_MENUKEY) {
 		s = getenv("menucmd");
 		if (s)
@@ -560,7 +557,6 @@ SKIPBOOT:
 	 * Main Loop for Monitor Command Processing
 	 */
 mainloop:
-
 #ifdef CONFIG_SYS_HUSH_PARSER
 	parse_file_outer();
 	/* This point is never reached */

@@ -23,7 +23,7 @@
 #include <asm/arch-ipq40xx/smem.h>
 #include <mmc.h>
 #include "ipq40xx_cdp.h"
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 
 #define DLOAD_MAGIC_COOKIE	0x10
 #define XMK_STR(x)		#x

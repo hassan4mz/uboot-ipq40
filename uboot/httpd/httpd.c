@@ -3,7 +3,7 @@
 #include "fs.h"
 #include "fsdata.h"
 #include <malloc.h>
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 
 #define STATE_NONE		0		// empty state (waiting for request...)
 #define STATE_FILE_REQUEST	1		// remote host sent GET request

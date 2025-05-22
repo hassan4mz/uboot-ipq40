@@ -49,7 +49,7 @@
 #include <linux/mtd/mtd.h>
 #include <nand.h>
 #include <jffs2/jffs2.h>
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #include "ipq40xx_cdp.h"
 
 typedef struct erase_info erase_info_t;

@@ -14,79 +14,13 @@
 #include "../httpd/uip.h"
 #include "../httpd/uip_arp.h"
 
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #include "ipq40xx_cdp.h"
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
-char *str = "hello";
-//#include <gpio.h>
-//#include <spi_api.h>
 
 static int arptimer = 0;
-//static int  HttpdTimeoutCountMax = 3;
-static int HttpdTimeoutCount __attribute__((unused)) = 0;
-static ulong HttpdTimeoutMSecs __attribute__((unused)) = 1000;
 extern int	webfailsafe_is_running;
-
-#if 0
-void webserver(void)
-{
-	if (NetLoop(HTTPD) < 0) {
-		printf("exit webserver.\n");
-	}
-}
-
-static void HttpdTimeout(void)
-{
-	puts("HttpdTimeout\n");
-	NetSetTimeout(HttpdTimeoutMSecs, HttpdTimeout);
-
-	
-}
-
-void httpd_start(void)
-{
-	DECLARE_GLOBAL_DATA_PTR;
-	struct uip_eth_addr eaddr;
-	unsigned short int ip[2];
-	
-	printf("Using %s device\n", eth_get_name());
-	printf("Listening for Web Server on %pI4\n", &NetOurIP);
-
-	
-
-	HttpdTimeoutCountMax = 3;
-	HttpdTimeoutCount = 0;
-	HttpdTimeoutMSecs = 10000;
-	NetSetTimeout(HttpdTimeoutMSecs, HttpdTimeout);
-
-	IPaddr_t tmp_ip_addr = ntohl( gd->bd->bi_ip_addr );
-	printf( "HTTP server is starting at IP: %ld.%ld.%ld.%ld\n", 
-		( tmp_ip_addr & 0xff000000 ) >> 24, ( tmp_ip_addr & 0x00ff0000 ) >> 16, 
-		( tmp_ip_addr & 0x0000ff00 ) >> 8, ( tmp_ip_addr & 0x000000ff ) );
-
-	HttpdStart();
-
-	// set local host ip address
-	ip[0] = htons( ( tmp_ip_addr & 0xFFFF0000 ) >> 16 );
-	ip[1] = htons( tmp_ip_addr & 0x0000FFFF );
-	
-	uip_sethostaddr( ip );
-
-	// set network mask (255.255.255.0 -> local network)
-	ip[0] = htons( ( ( 0xFFFFFF00 & 0xFFFF0000 ) >> 16 ) );
-	ip[1] = htons( ( 0xFFFFFF00 & 0x0000FFFF ) );
-
-	uip_setnetmask( ip );
-
-	webfailsafe_is_running = 1;
-
-	//while (1) {
-		HttpdHandler();
-	//}
-}
-#endif
-
 extern void NetSendHttpd(void);
 void HttpdHandler( void )
 {

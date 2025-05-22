@@ -33,11 +33,8 @@
 #include <asm/io.h>
 
 #include <common.h>
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #include "ipq40xx_cdp.h"
-
-int gl_gpio_init_status = 0;
-
 /*******************************************************
 Function description: configure GPIO functinality
 Arguments :

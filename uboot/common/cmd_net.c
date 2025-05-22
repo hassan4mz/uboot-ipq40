@@ -249,7 +249,7 @@ static int netboot_common(enum proto_t proto, cmd_tbl_t *cmdtp, int argc,
 		return 1;
 	}
 	bootstage_mark(BOOTSTAGE_ID_NET_NETLOOP_OK);
-	
+
 	/* NetLoop ok, update environment */
 	netboot_update_env();
 
@@ -284,11 +284,11 @@ int do_ping (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		return CMD_RET_USAGE;
 
 	if (NetLoop(PING) < 0) {
-		printf("ping failed; host %s is not alive\n\n", argv[1]);
+		printf("ping failed; host %s is not alive\n", argv[1]);
 		return 1;
 	}
 
-	printf("host %s is alive\n\n", argv[1]);
+	printf("host %s is alive\n", argv[1]);
 
 	return 0;
 }

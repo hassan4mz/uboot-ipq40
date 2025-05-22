@@ -54,8 +54,6 @@
 #include <net.h>
 #endif
 
-#include "gl/gl_ipq40xx_api.h"
-
 DECLARE_GLOBAL_DATA_PTR;
 
 #if	!defined(CONFIG_ENV_IS_IN_EEPROM)	&& \

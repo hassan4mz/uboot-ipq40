@@ -16,10 +16,10 @@
 #include "spi_flash_internal.h"
 
 #include <asm/arch-qcom-common/gpio.h>
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #include "ipq40xx_cdp.h"
 
-unsigned int gl_wirte_count = 0;
+unsigned int spi_wirte_count = 0;
 
 static void spi_flash_addr(struct spi_flash *flash, u32 addr, u8 *cmd)
 {
@@ -76,14 +76,14 @@ int spi_flash_cmd_read(struct spi_slave *spi, const u8 *cmd,
 int spi_flash_cmd_write(struct spi_slave *spi, const u8 *cmd, size_t cmd_len,
 		const void *data, size_t data_len, int twinkle_led)
 {
-	if ((gl_wirte_count % 500) == 0 && twinkle_led == 1) {
+	if ((spi_wirte_count % 500) == 0 && twinkle_led == 1) {
 		gpio_twinkle_value(g_gpio_led_upgrade_write_flashing_2);
 		if(g_gpio_led_upgrade_write_flashing_2 != g_gpio_led_upgrade_write_flashing_1)
 			gpio_twinkle_value(g_gpio_led_upgrade_write_flashing_1);
-		gl_wirte_count = 0;
+		spi_wirte_count = 0;
 	}
 
-	gl_wirte_count++;
+	spi_wirte_count++;
 	return spi_flash_read_write(spi, cmd, cmd_len, data, NULL, data_len);
 }
 

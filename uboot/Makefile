@@ -260,7 +260,6 @@ LIBS += drivers/bios_emulator/libatibiosemu.o
 LIBS += drivers/block/libblock.o
 LIBS += drivers/dma/libdma.o
 LIBS += drivers/fpga/libfpga.o
-LIBS += drivers/gl/libgl_ipq40xx_api.o
 ifdef CONFIG_HTTPD
 LIBS += httpd/libhttpd.o
 endif

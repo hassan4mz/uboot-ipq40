@@ -104,7 +104,7 @@
 #endif
 #include "tftp.h"
 
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 #ifdef CONFIG_HTTPD
 #include "httpd.h"
 #include "../httpd/uipopt.h"

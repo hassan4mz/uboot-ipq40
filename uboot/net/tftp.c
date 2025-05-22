@@ -17,7 +17,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 #include <asm/arch-qcom-common/gpio.h>
-#include "gl/gl_ipq40xx_api.h"
+#include "ipq40xx_api.h"
 
 
 /* Well known TFTP port # */
