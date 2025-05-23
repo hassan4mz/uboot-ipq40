@@ -1,0 +1,52 @@
+/* style.css */
+/* 基础样式重置 */
+body{background:#f0f3f7;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
+/* 主容器 */
+.main-container{width:100%;max-width:1200px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08);display:grid;grid-template-columns:220px 1fr;min-height:700px;}
+/* 左侧导航 */
+.side-nav{background:linear-gradient(135deg,#2A3A5F 0%,#36486F 100%);border-radius:12px 0 0 12px;padding:2rem 1rem;}
+#mac-input{display:none;}
+.nav-item{color:rgba(255,255,255,0.6);padding:1rem;margin:.5rem 0;border-radius:8px;cursor:pointer;transition:.3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:1rem;position:relative;font-size:20px;text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;transform:translateX(6px);}
+.nav-item.active{background:linear-gradient(90deg,rgba(0,230,255,0.15) 0%,transparent 100%);color:#00E6FF;box-shadow:4px 0 12px rgba(0,230,255,0.2);pointer-events:none;}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;height:100%;width:3px;background:linear-gradient(180deg,#00E6FF 0%,#0066FF 100%);}
+.content-area{padding:2.5rem;}
+.content-page{display:none;}
+.content-page.active{display:block;}
+h1{color:#2d8cf0;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;font-size:60px;justify-content:center;}
+/* 上传卡片 */
+.upload-card{border:2px dashed #e0e5ec;border-radius:10px;padding:2rem;text-align:center;margin-bottom:2rem;}
+.upload-card.danger{border-color:#ff4757;}
+/* 上传按钮 */
+.upload-btn{background:#00c878;color:#fff;padding:1rem 2rem;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:.8rem;transition:.2s;box-shadow:0 4px 12px rgba(0,200,120,0.25);border:none;font-size:1rem;}
+.upload-btn.danger{background:#ff4757;}
+.upload-btn:hover{transform:translateY(-2px);}
+.file-info{color:#666;margin:1.5rem 0;padding:1rem;background:#f8f9fb;border-radius:6px;}
+.submit-btn{width:100%;padding:1rem;background:#2d8cf0;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:1rem;transition:.25s;}
+.submit-btn.danger{background:#ff4757;}
+.submit-btn:disabled{background:#e8e9eb;color:#a8aab3;cursor:not-allowed;}
+.notice-box{background:#f8f9fb;border-left:4px solid #2d8cf0;padding:1.5rem;border-radius:8px;margin-top:2rem;}
+.notice-box.danger{border-color:#ff4757;background:#fff0f1;}
+.notice-text p{color:#4a4a4a;line-height:1.8;margin:.4rem 0;}
+/* MAC管理样式 */
+.mac-control{max-width:600px;margin:0 auto;}
+.form-group{margin-bottom:1.5rem;}
+.form-control{width:100%;padding:.8rem;border:1px solid #e0e5ec;border-radius:6px;background:#fff;}
+#mac-input{display:none;}
+.result-box{min-height:60px;padding:1rem;margin:1.5rem 0;border-radius:6px;text-align:center;display:flex;justify-content:center;align-items:center;}
+.result-box.success{background:rgba(45,140,240,0.1);color:#2d8cf0;}
+.result-box.error{background:rgba(255,71,87,0.1);color:#ff4757;}
+.form-row{display:flex;gap:1.5rem;margin-bottom:1.5rem;}
+.form-row .form-group{flex:1;}
+.mac-input .form-group{display:flex;align-items:center;gap:1rem;}
+.mac-input label{flex:0 0 100px;}
+.reboot-btn {
+    margin-top: 1.5rem;
+    background: #ff4757;
+    transition: .25s;
+}
+.reboot-btn:hover {
+    background: #e84118;
+}
+/* 响应式布局 */
+@media (max-width:768px){.main-container{grid-template-columns:1fr;min-height:auto;}.side-nav{border-radius:12px 12px 0 0;padding:1rem;}.nav-item{justify-content:center;padding:.8rem;}.content-area{padding:1.5rem;}h1{font-size:1.5rem;}}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>MIBIB更新</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container">
+        <nav class="side-nav">
+            <a href="index.html" class="nav-item"><span>📦固件更新</span></a>
+            <a href="uboot.html" class="nav-item"><span>🚀UBOOT更新</span></a>
+            <a href="art.html" class="nav-item"><span>📶ART更新</span></a>
+            <a href="mibib.html" class="nav-item active"><span>📊MIBIB更新◀</span></a>
+            <a href="mac.html" class="nav-item"><span>🛠️MAC管理</span></a>
+        </nav>
+        <main class="content-area">
+            <section class="content-page active" id="page-mibib">
+                <h1>📊MIBIB更新</h1>
+                <div class="upload-card">
+                    <form method="post" enctype="multipart/form-data" action="/mibib">
+                        <input type="file" name="mibib" id="mibib-file" hidden accept=".bin,.img" required>
+                        <label for="mibib-file" class="upload-btn">选择MIBIB文件</label>
+                        <div class="file-info" id="mibib-info">未选择文件</div>
+                        <button type="submit" class="submit-btn" id="mibib-submit" disabled>确认更新</button>
+                    </form>
+                </div>
+                <div class="notice-box">
+                    <div class="notice-text">
+                        <p>• 请勿在更新过程中断开设备的电源；</p>
+                        <p>• 请确认所选的MIBIB文件是正确的；</p>
+                        <p>• 如果更新成功，设备将自动重启。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded',function(){
+        var fileInput = document.getElementById('mibib-file');
+        var fileInfo = document.getElementById('mibib-info');
+        var submitBtn = document.getElementById('mibib-submit');
+        fileInput.addEventListener('change',function(){
+            fileInfo.textContent = fileInput.files[0] ? fileInput.files[0].name : '未选择文件';
+            submitBtn.disabled = !fileInput.files[0];
+        });
+    });
+    </script>
+</body>
+</html>

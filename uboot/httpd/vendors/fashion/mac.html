@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>MAC管理控制台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container">
+        <nav class="side-nav">
+            <a href="index.html" class="nav-item"><span>📦固件更新</span></a>
+            <a href="uboot.html" class="nav-item"><span>🚀UBOOT更新</span></a>
+            <a href="art.html" class="nav-item"><span>📶ART更新</span></a>
+            <a href="mibib.html" class="nav-item"><span>📊MIBIB更新</span></a>
+            <a href="mac.html" class="nav-item active"><span>🛠️MAC管理◀</span></a>
+        </nav>
+        <main class="content-area">
+            <section class="content-page active" id="page-mac">
+                <h1>🛠️MAC管理</h1>
+                <div class="mac-control">
+    <div class="form-row">  <!-- 新增包裹容器 -->
+        <div class="form-group">
+            <label for="action-type">操作类型</label>
+            <select id="action-type" class="form-control"><option value="read">读取MAC</option><option value="write">修改MAC</option></select>
+        </div>
+        <div class="form-group">
+            <label for="interface">网络接口</label>
+            <select id="interface" class="form-control"><option value="eth0">eth0</option><option value="eth1">eth1</option><option value="wifi0">wifi0</option><option value="wifi1">wifi1</option><option value="wifi2">wifi2</option></select>
+        </div>
+    </div>
+    <div class="mac-input" id="mac-input">
+        <div class="form-group">
+            <label for="mac-address">MAC地址</label>
+            <input type="text" id="mac-address" class="form-control" maxlength="12" pattern="[0-9a-fA-F]{12}" placeholder="输入12位十六进制字符">
+        </div>
+    </div>
+                    <button class="submit-btn" id="mac-submit" type="button">执行操作</button>
+                </div>
+                <div class="result-box" id="mac-result">
+                    <div class="result-content"></div>
+                </div>
+                <div class="notice-box">
+                    <div class="notice-text">
+                        <p>• MAC地址格式支持12位连续字符(例如a0b1c2d3e4f5);</p>
+                        <p>• 修改无线MAC地址会自动校验并更新校验和数值；</p>
+                        <p>• 若操作后无线速率异常，请重刷原厂ART并重新设置MAC地址，或者保持原厂默认MAC地址。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dom = {
+        actionType: document.getElementById('action-type'),
+        macInput: document.getElementById('mac-input'),
+        macSubmit: document.getElementById('mac-submit'),
+        resultBox: document.getElementById('mac-result'),
+        macAddress: document.getElementById('mac-address'),
+        iface: document.getElementById('interface')
+    };
+
+    // 保证 result-content 始终存在
+    function getResultContent() {
+        let result = dom.resultBox.querySelector('.result-content');
+        if (!result) {
+            result = document.createElement('div');
+            result.className = 'result-content';
+            dom.resultBox.innerHTML = '';
+            dom.resultBox.appendChild(result);
+        }
+        return result;
+    }
+
+    const updateUI = () => {
+        const isWrite = dom.actionType.value === 'write';
+        dom.macInput.style.display = isWrite ? 'block' : 'none';
+        dom.macSubmit.textContent = isWrite ? '确认修改' : '确认读取';
+        // 清空结果显示
+        dom.resultBox.className = '';
+        const result = getResultContent();
+        result.className = 'result-content';
+        result.innerHTML = '';
+    };
+
+    dom.macAddress.addEventListener('input', e => {
+        e.target.value = e.target.value
+            .replace(/[^a-fA-F0-9]/g, '')
+            .substring(0, 12)
+            .toLowerCase();
+    });
+
+    dom.macSubmit.addEventListener('click', () => {
+        const result = getResultContent();
+        dom.resultBox.className = '';
+        result.className = 'result-content';
+        result.innerHTML = '';
+        const action = dom.actionType.value;
+        const iface = dom.iface.value;
+        const mac = dom.macAddress.value.trim();
+        if (action === 'write' && mac.length !== 12) {
+            dom.resultBox.className = 'error';
+            result.innerHTML = '<div style="text-align: center">错误：MAC地址格式无效</div>';
+            return;
+        }
+        dom.resultBox.className = '';
+        result.innerHTML = '处理中...';
+        let params = 'action=' + encodeURIComponent(action) + '&iface=' + encodeURIComponent(iface);
+        if (action === 'write') params += '&mac=' + encodeURIComponent(mac);
+        fetch('/macrw', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: params
+        }).then(resp => resp.text())
+        .then(txt => {
+            if (txt.indexOf('成功') !== -1 || txt.indexOf('success') !== -1) {
+                dom.resultBox.className = 'success';
+                result.innerHTML = '<div style="text-align:center">' + txt + '</div>';
+            } else {
+                dom.resultBox.className = 'error';
+                result.innerHTML = '<div style="text-align:center">' + txt + '</div>';
+            }
+        }).catch(() => {
+            dom.resultBox.className = 'error';
+            result.innerHTML = '<div style="text-align: center">请求失败</div>';
+        });
+    });
+
+    dom.actionType.addEventListener('change', updateUI);
+    dom.iface.addEventListener('change', updateUI);
+    updateUI();
+});
+</script>
+</body>
+</html>
