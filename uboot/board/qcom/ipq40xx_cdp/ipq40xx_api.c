@@ -11,126 +11,126 @@ void get_mmc_part_info(void);
 void HttpdLoop(void);
 
 unsigned long hex2int(const char *a, unsigned int len) {
-    unsigned long val = 0;
-    unsigned int i;
-    for (i = 0; i < len; i++) {
-        unsigned char c = a[i];
-        unsigned char digit = (c <= '9') ? (c - '0') : (c - 'A' + 10);
-        val = (val << 4) | digit;
-    }
-    return val;
+	unsigned long val = 0;
+	unsigned int i;
+	for (i = 0; i < len; i++) {
+		unsigned char c = a[i];
+		unsigned char digit = (c <= '9') ? (c - '0') : (c - 'A' + 10);
+		val = (val << 4) | digit;
+	}
+	return val;
 }
 
 int do_checkout_firmware(void) {
-    #define CHECK_ADDR(addr, val) (*(volatile unsigned char *)(addr) == (val))
-    
-    if (CHECK_ADDR(0x8800005c, 0x46) &&  // 'F'
-        CHECK_ADDR(0x8800005d, 0x6c) &&  // 'l'
-        CHECK_ADDR(0x8800005e, 0x61) &&  // 'a'
-        CHECK_ADDR(0x8800005f, 0x73) &&  // 's'
-        CHECK_ADDR(0x88000060, 0x68)) {  // 'h'
-        return FW_TYPE_QSDK;
-    }
-    
-    if (CHECK_ADDR(0x880001fe, 0x55) && 
-        CHECK_ADDR(0x880001ff, 0xAA)) {
-        return FW_TYPE_OPENWRT_EMMC;
-    }
-    
-    return FW_TYPE_OPENWRT;
+	#define CHECK_ADDR(addr, val) (*(volatile unsigned char *)(addr) == (val))
+	
+	if (CHECK_ADDR(0x8800005c, 0x46) &&  // 'F'
+		CHECK_ADDR(0x8800005d, 0x6c) &&  // 'l'
+		CHECK_ADDR(0x8800005e, 0x61) &&  // 'a'
+		CHECK_ADDR(0x8800005f, 0x73) &&  // 's'
+		CHECK_ADDR(0x88000060, 0x68)) {  // 'h'
+		return FW_TYPE_QSDK;
+	}
+	
+	if (CHECK_ADDR(0x880001fe, 0x55) && 
+		CHECK_ADDR(0x880001ff, 0xAA)) {
+		return FW_TYPE_OPENWRT_EMMC;
+	}
+	
+	return FW_TYPE_OPENWRT;
 }
 
 int upgrade(void) {
-    char cmd[128] = {0};
-    int fw_type = do_checkout_firmware();
-    const char *filesize = getenv("filesize");
-    unsigned long file_size = filesize ? hex2int(filesize, strlen(filesize)) : 0;
-    
-    switch (fw_type) {
-        case FW_TYPE_OPENWRT:
-            switch (gboard_param->machid) {
-                case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
-                case MACH_TYPE_IPQ40XX_AP_DK04_1_C3:
-                case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
-                    if (file_size >= openwrt_firmware_size) {
-                        printf("Firmware too large! Not flashing.\n");
-                        return 0;
-                    }
-                    snprintf(cmd, sizeof(cmd), 
-                        "sf probe && sf erase 0x%x 0x%x && sf write 0x88000000 0x%x $filesize",
-                        openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start);
-                    break;
-                    
-                case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
-                case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
-                    snprintf(cmd, sizeof(cmd),
-                        "nand device 1 && nand erase 0x%x 0x%x && nand write 0x88000000 0x%x $filesize",
-                        openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start);
-                    break;
-            }
-            break;
-            
-        case FW_TYPE_OPENWRT_EMMC:
-            if (file_size > 0) {
-                unsigned long blocks = (file_size / 512) + 1;
-                snprintf(cmd, sizeof(cmd),
-                    "mmc erase 0x0 0x109800 && mmc write 0x88000000 0x0 0x%lx", blocks);
-                printf("%s\n", cmd);
-            }
-            break;
-            
-        default:
-            snprintf(cmd, sizeof(cmd),
-                "sf probe && imgaddr=0x88000000 && source $imgaddr:script");
-            break;
-    }
-    
-    return run_command(cmd, 0);
+	char cmd[128] = {0};
+	int fw_type = do_checkout_firmware();
+	const char *filesize = getenv("filesize");
+	unsigned long file_size = filesize ? hex2int(filesize, strlen(filesize)) : 0;
+	
+	switch (fw_type) {
+		case FW_TYPE_OPENWRT:
+			switch (gboard_param->machid) {
+				case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
+				case MACH_TYPE_IPQ40XX_AP_DK04_1_C3:
+				case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
+					if (file_size >= openwrt_firmware_size) {
+						printf("Firmware too large! Not flashing.\n");
+						return 0;
+					}
+					snprintf(cmd, sizeof(cmd), 
+						"sf probe && sf erase 0x%x 0x%x && sf write 0x88000000 0x%x $filesize",
+						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start);
+					break;
+					
+				case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+				case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+					snprintf(cmd, sizeof(cmd),
+						"nand device 1 && nand erase 0x%x 0x%x && nand write 0x88000000 0x%x $filesize",
+						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start);
+					break;
+			}
+			break;
+			
+		case FW_TYPE_OPENWRT_EMMC:
+			if (file_size > 0) {
+				unsigned long blocks = (file_size / 512) + 1;
+				snprintf(cmd, sizeof(cmd),
+					"mmc erase 0x0 0x109800 && mmc write 0x88000000 0x0 0x%lx", blocks);
+				printf("%s\n", cmd);
+			}
+			break;
+			
+		default:
+			snprintf(cmd, sizeof(cmd),
+				"sf probe && imgaddr=0x88000000 && source $imgaddr:script");
+			break;
+	}
+	
+	return run_command(cmd, 0);
 }
 
 void LED_INIT(void) {
-    switch (gboard_param->machid) {
-        case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
-            gpio_set_value(GPIO_B1300_MESH_LED, 0);
-            gpio_set_value(GPIO_B1300_WIFI_LED, 0);
-            break;
-        case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
-            gpio_set_value(GPIO_AP1300_POWER_LED, 1);
-            gpio_set_value(GPIO_AP1300_INET_LED, 0);
-            break;
-        case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
-            gpio_set_value(GPIO_AP4220_POWER_LED, 0);
-            gpio_set_value(GPIO_AP4220_2GWIFI_LED, 1);
-            gpio_set_value(GPIO_AP4220_5GWIFI_LED, 0);
-            break;
-        case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
-            gpio_set_value(GPIO_S1300_MESH_LED, 0);
-            gpio_set_value(GPIO_S1300_WIFI_LED, 0);
-            break;
-        case MACH_TYPE_IPQ40XX_AP_DK04_1_C3:
-            gpio_set_value(GPIO_B2200_INET_WHITE_LED, 1);
-            gpio_set_value(GPIO_B2200_INET_BLUE_LED, 0);
-            gpio_set_value(GPIO_B2200_POWER_BLUE_LED, 1);
-            gpio_set_value(GPIO_B2200_POWER_WHITE_LED, 1);
-            break;
-        default:
-            break;
-    }
+	switch (gboard_param->machid) {
+		case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
+			gpio_set_value(GPIO_B1300_MESH_LED, 0);
+			gpio_set_value(GPIO_B1300_WIFI_LED, 0);
+			break;
+		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+			gpio_set_value(GPIO_AP1300_POWER_LED, 1);
+			gpio_set_value(GPIO_AP1300_INET_LED, 0);
+			break;
+		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+			gpio_set_value(GPIO_AP4220_POWER_LED, 0);
+			gpio_set_value(GPIO_AP4220_2GWIFI_LED, 1);
+			gpio_set_value(GPIO_AP4220_5GWIFI_LED, 0);
+			break;
+		case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
+			gpio_set_value(GPIO_S1300_MESH_LED, 0);
+			gpio_set_value(GPIO_S1300_WIFI_LED, 0);
+			break;
+		case MACH_TYPE_IPQ40XX_AP_DK04_1_C3:
+			gpio_set_value(GPIO_B2200_INET_WHITE_LED, 1);
+			gpio_set_value(GPIO_B2200_INET_BLUE_LED, 0);
+			gpio_set_value(GPIO_B2200_POWER_BLUE_LED, 1);
+			gpio_set_value(GPIO_B2200_POWER_WHITE_LED, 1);
+			break;
+		default:
+			break;
+	}
 }
 
 void LED_BOOTING(void) {
-    switch (gboard_param->machid) {
-        case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
-            gpio_set_value(GPIO_AP1300_POWER_LED, 1);
-            gpio_set_value(GPIO_AP1300_INET_LED, 0);
-            break;
-        case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
-            gpio_set_value(GPIO_AP4220_POWER_LED, 0);
-            gpio_set_value(GPIO_AP4220_2GWIFI_LED, 1);
-            gpio_set_value(GPIO_AP4220_5GWIFI_LED, 0);
-        default:
-            break;
-    }
+	switch (gboard_param->machid) {
+		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+			gpio_set_value(GPIO_AP1300_POWER_LED, 1);
+			gpio_set_value(GPIO_AP1300_INET_LED, 0);
+			break;
+		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+			gpio_set_value(GPIO_AP4220_POWER_LED, 0);
+			gpio_set_value(GPIO_AP4220_2GWIFI_LED, 1);
+			gpio_set_value(GPIO_AP4220_5GWIFI_LED, 0);
+		default:
+			break;
+	}
 }
 
 void wan_led_toggle(void)
@@ -211,13 +211,13 @@ static qca_mmc *host = &mmc_host;
 #endif
 
 void get_mmc_part_info() {
-    block_dev_desc_t *blk_dev;
-    blk_dev = mmc_get_dev(host->dev_num);
-    if(blk_dev->part_type == PART_TYPE_DOS){
-        printf("\n\n");
-        print_part(blk_dev);
-        printf("\n\n");
-    }
+	block_dev_desc_t *blk_dev;
+	blk_dev = mmc_get_dev(host->dev_num);
+	if(blk_dev->part_type == PART_TYPE_DOS){
+		printf("\n\n");
+		print_part(blk_dev);
+		printf("\n\n");
+	}
 }
 
 #ifdef CONFIG_HTTPD
