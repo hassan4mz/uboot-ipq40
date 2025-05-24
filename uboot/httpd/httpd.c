@@ -42,7 +42,7 @@ extern void gpio_twinkle_value(int gpio_num);
 extern void wan_led_toggle(void);
 
 int web_macrw_handle(int argc, char **argv, char *resp_buf, int bufsize);
-
+int web_setenv_handle(int argc, char **argv, char *resp_buf, int bufsize);
 // http app state
 struct httpd_state *hs;
 
@@ -275,6 +275,47 @@ void httpd_appcall(void) {
 							free(body_copy);
 							return;
 						}
+					}
+					else if(strncmp((char*)uip_appdata, "POST /setenv", 12) == 0) {
+						char *body = strstr((char*)uip_appdata, "\r\n\r\n");
+						if (body) {
+							body += 4;
+							int header_len = body - (char*)uip_appdata;
+							int body_len = uip_len - header_len;
+							char *body_copy = malloc(body_len + 1);
+							memcpy(body_copy, body, body_len);
+							body_copy[body_len] = '\0';
+							int argc = 0;
+							char *argv[10];
+							parse_url_args(body_copy, &argc, argv, 10);
+							char resp_buf[8192];
+							int resp_len = web_setenv_handle(argc, argv, resp_buf, sizeof(resp_buf));
+							// === print to console ===
+							printf("[WEB setenv] %.*s\n", resp_len, resp_buf);
+							// ========================
+							hs->is_macrw_resp = 1;
+							hs->macrw_buf = (u8_t *)resp_buf;
+							hs->macrw_len = resp_len;
+							hs->dataptr = hs->macrw_buf;
+							hs->upload = hs->macrw_len;
+							uip_send(hs->dataptr, (hs->upload > uip_mss() ? uip_mss() : hs->upload));
+							free(body_copy);
+							return;
+						}
+					} else if(strncmp((char*)uip_appdata, "POST /reset", 11) == 0) {
+						static char resp_buf[] =
+						"HTTP/1.1 200 OK\r\n"
+						"Content-Type: text/plain\r\n"
+						"Connection: close\r\n\r\n"
+						"Rebooting...\n";
+						hs->is_macrw_resp = 1;
+						hs->macrw_buf = (u8_t *)resp_buf;
+						hs->macrw_len = strlen(resp_buf);
+						hs->dataptr = hs->macrw_buf;
+						hs->upload = hs->macrw_len;
+						uip_send(hs->dataptr, (hs->upload > uip_mss() ? uip_mss() : hs->upload));
+						do_reset(NULL, 0, 0, NULL);
+						return;
 					}
 				}
 				if(hs->state == STATE_FILE_REQUEST){
