@@ -34,7 +34,7 @@
 	"change2=set bootcount; set changed 1; saveenv\0" \
 	"change3=echo Active partition changed to [$active]\0" \
 	"detect1=run boot9; set partname rootfs1; run detect3 rec3\0" \
-	"detect2=echo \"Single partition mode\"; set partname rootfs; saveenv\0" \
+	"detect2=echo \"Single partition mode\"; set partname rootfs; run boot11 rec3\0" \
 	"detect3=echo \"Active partition set to rootfs1\"; set active 1\0" \
 	"do_change=run change1 change2 change3; reset\0" \
 	"do_lub=run lub1 lub2 lub3\0" \
