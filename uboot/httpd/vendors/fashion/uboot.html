@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>UBOOT更新</title>
-    <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<title>UBOOT更新</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-container">
-        <nav class="side-nav">
-            <a href="index.html" class="nav-item"><span>📦固件更新</span></a>
-            <a href="uboot.html" class="nav-item active"><span>🚀UBOOT更新◀</span></a>
-            <a href="art.html" class="nav-item"><span>📶ART更新</span></a>
-            <a href="mibib.html" class="nav-item"><span>📊MIBIB更新</span></a>
-            <a href="mac.html" class="nav-item"><span>🛠️MAC管理</span></a>
-            <a href="env.html" class="nav-item"><span>⚙️环境变量</span></a>
-        </nav>
-        <main class="content-area">
-            <section class="content-page active" id="page-uboot">
-                <h1>🚀UBOOT更新</h1>
-                <div class="upload-card">
-                    <form method="post" enctype="multipart/form-data" action="/uboot">
-                        <input type="file" name="uboot" id="uboot-file" hidden accept=".bin,.elf,.img" required>
-                        <label for="uboot-file" class="upload-btn">选择UBOOT文件</label>
-                        <div class="file-info" id="uboot-info">未选择文件</div>
-                        <button type="submit" class="submit-btn" id="uboot-submit" disabled>确认更新</button>
-                    </form>
-                </div>
-                <div class="notice-box danger">
-                    <div class="notice-text">
-                        <p>• 更新U-BOOT是一个十分危险的操作，可能导致您的设备无法启动；</p>
-                        <p>• 请确认所选的UBOOT文件是正确的；</p>
-                        <p>• 如果更新成功，设备将自动重启。</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script>
-    document.addEventListener('DOMContentLoaded',function(){
-        var fileInput = document.getElementById('uboot-file');
-        var fileInfo = document.getElementById('uboot-info');
-        var submitBtn = document.getElementById('uboot-submit');
-        fileInput.addEventListener('change',function(){
-            fileInfo.textContent = fileInput.files[0] ? fileInput.files[0].name : '未选择文件';
-            submitBtn.disabled = !fileInput.files[0];
-        });
-    });
-    </script>
+	<div class="main-container">
+		<nav class="side-nav">
+			<a href="index.html" class="nav-item"><span>📦固件更新</span></a>
+			<a href="uboot.html" class="nav-item active"><span>🚀UBOOT更新◀</span></a>
+			<a href="art.html" class="nav-item"><span>📶ART更新</span></a>
+			<a href="mibib.html" class="nav-item"><span>📊MIBIB更新</span></a>
+			<a href="mac.html" class="nav-item"><span>🛠️MAC管理</span></a>
+			<a href="env.html" class="nav-item"><span>⚙️环境变量</span></a>
+		</nav>
+		<main class="content-area">
+			<section class="content-page active" id="page-uboot">
+				<h1>🚀UBOOT更新</h1>
+				<div class="upload-card">
+					<form method="post" enctype="multipart/form-data" action="/uboot">
+						<input type="file" name="uboot" id="uboot-file" hidden accept=".bin,.elf,.img" required>
+						<label for="uboot-file" class="upload-btn">选择UBOOT文件</label>
+						<div class="file-info" id="uboot-info">未选择文件</div>
+						<button type="submit" class="submit-btn" id="uboot-submit" disabled>确认更新</button>
+					</form>
+				</div>
+				<div class="notice-box danger">
+					<div class="notice-text">
+						<p>• 更新U-BOOT是一个十分危险的操作，可能导致您的设备无法启动；</p>
+						<p>• 请确认所选的UBOOT文件是正确的；</p>
+						<p>• 如果更新成功，设备将自动重启。</p>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+	<script>
+	document.addEventListener('DOMContentLoaded',function(){
+		var fileInput = document.getElementById('uboot-file');
+		var fileInfo = document.getElementById('uboot-info');
+		var submitBtn = document.getElementById('uboot-submit');
+		fileInput.addEventListener('change',function(){
+			fileInfo.textContent = fileInput.files[0] ? fileInput.files[0].name : '未选择文件';
+			submitBtn.disabled = !fileInput.files[0];
+		});
+	});
+	</script>
 </body>
 </html>

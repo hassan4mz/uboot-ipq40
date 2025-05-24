@@ -41,12 +41,12 @@ h1{color:#2d8cf0;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;fon
 .mac-input .form-group{display:flex;align-items:center;gap:1rem;}
 .mac-input label{flex:0 0 100px;}
 .reboot-btn {
-    margin-top: 1.5rem;
-    background: #ff4757;
-    transition: .25s;
+	margin-top: 1.5rem;
+	background: #ff4757;
+	transition: .25s;
 }
 .reboot-btn:hover {
-    background: #e84118;
+	background: #e84118;
 }
 /* 响应式布局 */
 @media (max-width:768px){.main-container{grid-template-columns:1fr;min-height:auto;}.side-nav{border-radius:12px 12px 0 0;padding:1rem;}.nav-item{justify-content:center;padding:.8rem;}.content-area{padding:1.5rem;}h1{font-size:1.5rem;}}
