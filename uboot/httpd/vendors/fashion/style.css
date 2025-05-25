@@ -50,3 +50,31 @@ h1{color:#2d8cf0;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;fon
 }
 /* 响应式布局 */
 @media (max-width:768px){.main-container{grid-template-columns:1fr;min-height:auto;}.side-nav{border-radius:12px 12px 0 0;padding:1rem;}.nav-item{justify-content:center;padding:.8rem;}.content-area{padding:1.5rem;}h1{font-size:1.5rem;}}
+
+/* 新增按钮组样式 */
+.env-button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.env-button-group .submit-btn {
+    flex: 1;
+    margin: 0;
+    min-width: 80px; /* 设置最小宽度防止按钮过小 */
+}
+
+/* 删除按钮样式 */
+.env-button-group .delete-btn {
+    background-color: #ffa940;
+}
+
+/* 修改按钮样式 */
+.env-button-group .modify-btn {
+    background-color: #2d8cf0;
+}
+
+/* 重启按钮样式 */
+.env-button-group .reboot-btn {
+    background-color: #ff4757;
+}

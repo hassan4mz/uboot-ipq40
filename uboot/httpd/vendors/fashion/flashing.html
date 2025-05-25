@@ -4,6 +4,9 @@
 	<meta charset="utf-8">
 	<title>更新进行中</title>
 	<link rel="stylesheet" href="style.css">
+	<style>
+		*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:"Arial",sans-serif;background-color:#f4f6f9}#m{max-width:750px;margin:40px auto;background:#ffffff;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);overflow:hidden}#content{padding:30px;text-align:center}h1{font-size:32px;color:#333;margin-bottom:20px}p{font-size:15px;color:#555;line-height:1.6}#l{height:30px;width:30px;margin:0 auto 20px;border-left:7px solid #EAF1FF;border-right:7px solid #EAF1FF;border-bottom:7px solid #EAF1FF;border-top:7px solid #2450AD;border-radius:100%;animation:r 1s infinite linear}@keyframes r{from{transform:rotate(0deg)}to{transform:rotate(359deg)}}#f{text-align:center;padding:20px;color:#888;font-size:13px}#f a{color:#2f54eb;text-decoration:none}#f a:hover{text-decoration:underline}
+	</style>
 </head>
 <body>
 	<div class="main-container" style="grid-template-columns: 1fr; min-height: 400px;">
@@ -13,7 +16,7 @@
 				<div class="notice-box">
 					<div class="notice-text" style="text-align:center;">
 						<p>文件已成功上传！当前正在进行更新，请耐心等待，设备将在更新完成后自动重启。<br>更新时间会根据固件的大小有所不同，最多可能需要几分钟。您可以在此期间关闭此页面。</p>
-						<div class="loading-spinner"></div>
+						<div id="l"></div>
 					</div>
 				</div>
 			</section>
