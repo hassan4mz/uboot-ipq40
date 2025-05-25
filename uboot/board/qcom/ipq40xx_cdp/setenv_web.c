@@ -43,22 +43,23 @@ int web_setenv_handle(int argc, char **argv, char *resp_buf, int bufsize) {
 		"Connection: close\r\n\r\n");
 	// 查询所有变量
 	if (!var_dec[0] || strcmp(var_dec, "all") == 0) {
-		int idx = 0;
-		const unsigned char *env = env_get_addr(0);
-		int truncated = 0;
-		while (env[idx]) {
-			int n = strlen((const char *)&env[idx]);
-			if (len + n + 2 >= bufsize) {
-				truncated = 1;
-				break;
-			}
-			len += snprintf(resp_buf + len, bufsize - len, "%s\n", &env[idx]);
-			idx += n + 1;
-		}
-		if (truncated)
-			len += snprintf(resp_buf + len, bufsize - len, "[...output truncated...]\n");
-		resp_buf[len] = '\0';
-		return len;
+	    int idx = 0;
+	    const unsigned char *env = env_get_addr(0);
+	    int truncated = 0;
+	    while (env[idx]) {
+	        int n = strlen((const char *)&env[idx]);
+	        if (len + n + 2 >= bufsize) {
+	            truncated = 1;
+	            break;
+	        }
+	        // 确保每条变量后都有换行符
+	        len += snprintf(resp_buf + len, bufsize - len, "%s<br>", &env[idx]); // 改为<br>标签
+	        idx += n + 1;
+	    }
+	    if (truncated)
+	        len += snprintf(resp_buf + len, bufsize - len, "[...output truncated...]<br>");
+	    resp_buf[len] = '\0';
+	    return len;
 	}
 	// 查询单个变量
 	if (val == NULL) {

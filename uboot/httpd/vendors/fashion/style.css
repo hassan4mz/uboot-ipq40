@@ -78,3 +78,8 @@ h1{color:#2d8cf0;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;fon
 .env-button-group .reboot-btn {
     background-color: #ff4757;
 }
+
+.notice-box {
+    white-space: pre-line; /* 保留换行符 */
+    word-wrap: break-word; /* 长单词换行 */
+}
