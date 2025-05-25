@@ -85,7 +85,9 @@ function print_data_array() {
 
 	echo "," >> "$files_content_tmp"
 	echo "/* Page/File content */" >> "$files_content_tmp"
-	echo "$_file_content," >> "$files_content_tmp"
+	if [ -n "$_file_content" ]; then
+	    echo "$_file_content," >> "$files_content_tmp"
+	fi
 	echo "0x00 };" >> "$files_content_tmp"
 	echo "" >> "$files_content_tmp"
 }
@@ -131,6 +133,11 @@ if [ -d vendors/"$vendor_dir"  ]; then # If vendor dir exists
 	`touch "fsdata.c"`
 	`cat "$files_content_tmp" > "fsdata.c"`
 	`cat "$files_list_tmp" >> "fsdata.c"`
+
+	# 删除最后一个逗号（只保留0x00结尾）
+	sed -i 's/,\s*0x00\s*};/ 0x00 };/g' fsdata.c
+	# 删除数组开头的逗号
+	sed -i 's/{[[:space:]]*,/{/g' fsdata.c
 
 	`rm "$files_content_tmp" "$files_list_tmp"`
 else
