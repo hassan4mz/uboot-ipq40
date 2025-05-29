@@ -95,7 +95,7 @@ build_board() {
 	sed -r 's/\x1B\[[0-9;]*[a-zA-Z]//g; s/[[:cntrl:]]//g; s/[^[:print:]\t]//g' build.log > build.clean.log
 
 	local timestamp=$(date +%Y%m%d_%H%M%S)
-	local zipfile="bin/output-${board}-${timestamp}.zip"
+	local zipfile="bin/u-boot-${board}-${timestamp}.zip"
 	zip -9j "$zipfile" "$out_elf" "$out_elf.md5" "$out_bin" "$out_bin.md5" build.clean.log > /dev/null
 	echo -e "${GREEN}📦 打包成功: $(basename "$zipfile")${RESET}" | tee -a "$LOGFILE"
 	# 新增：打包后自动清理上一级目录下的日志
