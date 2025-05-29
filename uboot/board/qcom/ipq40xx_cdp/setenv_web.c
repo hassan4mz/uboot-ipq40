@@ -4,65 +4,103 @@
 #include <linux/string.h>
 #include <linux/ctype.h>
 
-static void urldecode(char *dst, const char *src) {
+static void urldecode(char *dst, const char *src)
+{
 	char a, b;
-	while (*src) {
+	while (*src)
+	{
 		if ((*src == '%') &&
 			((a = src[1]) && (b = src[2])) &&
-			(isxdigit(a) && isxdigit(b))) {
-			if (a >= 'a') a -= 'a'-'A';
-			if (a >= 'A') a -= ('A' - 10); else a -= '0';
-			if (b >= 'a') b -= 'a'-'A';
-			if (b >= 'A') b -= ('A' - 10); else b -= '0';
-			*dst++ = 16*a+b;
-			src+=3;
-		} else if (*src == '+') {
+			(isxdigit(a) && isxdigit(b)))
+		{
+			if (a >= 'a')
+				a -= 'a' - 'A';
+			if (a >= 'A')
+				a -= ('A' - 10);
+			else
+				a -= '0';
+			if (b >= 'a')
+				b -= 'a' - 'A';
+			if (b >= 'A')
+				b -= ('A' - 10);
+			else
+				b -= '0';
+			*dst++ = 16 * a + b;
+			src += 3;
+		}
+		else if (*src == '+')
+		{
 			*dst++ = ' ';
 			src++;
-		} else {
+		}
+		else
+		{
 			*dst++ = *src++;
 		}
 	}
 	*dst = '\0';
 }
-int web_setenv_handle(int argc, char **argv, char *resp_buf, int bufsize) {
+int web_setenv_handle(int argc, char **argv, char *resp_buf, int bufsize)
+{
 	const char *var = NULL, *val = NULL;
 	int i, len = 0;
-	for (i = 0; i < argc; i++) {
+	for (i = 0; i < argc; i++)
+	{
 		if (strncmp(argv[i], "var=", 4) == 0)
 			var = argv[i] + 4;
 		else if (strncmp(argv[i], "val=", 4) == 0)
 			val = argv[i] + 4;
 	}
 	char var_dec[4096] = {0}, val_dec[4096] = {0};
-	if (var) urldecode(var_dec, var); else var_dec[0] = 0;
-	if (val) urldecode(val_dec, val); else val_dec[0] = 0;
+	if (var)
+		urldecode(var_dec, var);
+	else
+		var_dec[0] = 0;
+	if (val)
+		urldecode(val_dec, val);
+	else
+		val_dec[0] = 0;
 	len += snprintf(resp_buf + len, bufsize - len,
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/plain\r\n"
-		"Connection: close\r\n\r\n");
+					"HTTP/1.1 200 OK\r\n"
+					"Content-Type: text/plain\r\n"
+					"Connection: close\r\n\r\n");
 	// 查询所有变量
-	if (!var_dec[0] || strcmp(var_dec, "all") == 0) {
-	    int idx = 0;
-	    const unsigned char *env = env_get_addr(0);
-	    int truncated = 0;
-	    while (env[idx]) {
-	        int n = strlen((const char *)&env[idx]);
-	        if (len + n + 2 >= bufsize) {
-	            truncated = 1;
-	            break;
-	        }
-	        // 确保每条变量后都有换行符
-	        len += snprintf(resp_buf + len, bufsize - len, "%s<br>", &env[idx]); // 改为<br>标签
-	        idx += n + 1;
-	    }
-	    if (truncated)
-	        len += snprintf(resp_buf + len, bufsize - len, "[...output truncated...]<br>");
-	    resp_buf[len] = '\0';
-	    return len;
+	if (!var_dec[0] || strcmp(var_dec, "all") == 0)
+	{
+		int idx = 0;
+		const unsigned char *env = env_get_addr(0);
+		int truncated = 0;
+		while (env[idx])
+		{
+			int n = strlen((const char *)&env[idx]);
+			if (len + n + 2 >= bufsize)
+			{
+				truncated = 1;
+				break;
+			}
+			// 确保每条变量后都有换行符
+			len += snprintf(resp_buf + len, bufsize - len, "%s<br>", &env[idx]); // 改为<br>标签
+			idx += n + 1;
+		}
+		if (truncated)
+			len += snprintf(resp_buf + len, bufsize - len, "[...output truncated...]<br>");
+		resp_buf[len] = '\0';
+		return len;
+	}
+	// 恢复默认环境变量
+	if (strcmp(var_dec, "default") == 0)
+	{
+		set_default_env("Resetting to default environment");
+		if (saveenv() == 0)
+			len += snprintf(resp_buf + len, bufsize - len, "Success: Environment restored to default\n");
+		else
+			len += snprintf(resp_buf + len, bufsize - len, "Error: Failed to restore default environment\n");
+		resp_buf[len] = '\0';
+		return len;
 	}
 	// 查询单个变量
-	if (val == NULL) {
+	if (val == NULL)
+	{
 		char *env_val = getenv(var_dec);
 		if (env_val)
 			len += snprintf(resp_buf + len, bufsize - len, "Value: %s=%s\n", var_dec, env_val);
@@ -72,7 +110,8 @@ int web_setenv_handle(int argc, char **argv, char *resp_buf, int bufsize) {
 		return len;
 	}
 	// 清空变量（unsetenv）
-	if (val && val_dec[0] == 0) {
+	if (val && val_dec[0] == 0)
+	{
 		if (setenv(var_dec, NULL) == 0 && saveenv() == 0)
 			len += snprintf(resp_buf + len, bufsize - len, "Success: %s unset\n", var_dec);
 		else
