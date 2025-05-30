@@ -1116,7 +1116,7 @@ gpio_func_data_t sw_gpio_qfn[] = {
 	},
 };
 
-gpio_func_data_t ap_dk01_1_c2_sw_gpio_qfn[] = {
+gpio_func_data_t AP_DK01_AP4220_sw_gpio_qfn[] = {
 	{
 		.gpio = 52,
 		.func = 2,
@@ -1200,7 +1200,7 @@ gpio_func_data_t ap_dk01_1_c2_sw_gpio_qfn[] = {
 	},
 };
 
-gpio_func_data_t ap_dk01_ap4220_sw_gpio_qfn[] = {
+gpio_func_data_t ap_dk01_1_c2_sw_gpio_qfn[] = {
 	{
 		.gpio = 52,
 		.func = 2,
@@ -1554,8 +1554,8 @@ board_ipq40xx_params_t board_params[] = {
 		.ddr_size = (128 << 20),
 		.mtdids = "nand2=spi0.0",
 		.console_uart_cfg = &uart1_console_uart_dk01,
-		.sw_gpio = ap_dk01_1_c2_sw_gpio_qfn,
-		.sw_gpio_count = ARRAY_SIZE(ap_dk01_1_c2_sw_gpio_qfn),
+		.sw_gpio = AP_DK01_AP4220_sw_gpio_qfn,
+		.sw_gpio_count = ARRAY_SIZE(AP_DK01_AP4220_sw_gpio_qfn),
 		.edma_cfg = {
 			ipq40xx_edma_cfg(0, 5, PSGMII,
 					0, 1, 2, 3, 4)
@@ -1583,12 +1583,12 @@ board_ipq40xx_params_t board_params[] = {
 		.dtb_config_name = { "config@4", "config@ap.dk01.1-c1", "config@1" },
 	},
 	{
-		.machid = MACH_TYPE_IPQ40XX_AP_DK01_1_C2,
+		.machid = MACH_TYPE_IPQ40XX_AP_DK01_AP4220,
 		.ddr_size = (256 << 20),
 		.mtdids = "nand1=nand1,nand2=spi0.0",
 		.console_uart_cfg = &uart1_console_uart_dk01,
-		.sw_gpio = ap_dk01_1_c2_sw_gpio_qfn,
-		.sw_gpio_count = ARRAY_SIZE(ap_dk01_1_c2_sw_gpio_qfn),
+		.sw_gpio = AP_DK01_AP4220_sw_gpio_qfn,
+		.sw_gpio_count = ARRAY_SIZE(AP_DK01_AP4220_sw_gpio_qfn),
 		.edma_cfg = {
 			ipq40xx_edma_cfg(0, 5, PSGMII,
 					0, 1, 2, 3, 4)
@@ -1599,12 +1599,12 @@ board_ipq40xx_params_t board_params[] = {
 		.dtb_config_name = { "config@5", "config@ap.dk01.1-c2" },
 	},
 	{
-		.machid = MACH_TYPE_IPQ40XX_AP_DK01_AP4220,
+		.machid = MACH_TYPE_IPQ40XX_ap_dk01_1_c2,
 		.ddr_size = (256 << 20),
 		.mtdids = "nand1=nand1,nand2=spi0.0",
 		.console_uart_cfg = &uart1_console_uart_dk01,
-		.sw_gpio = ap_dk01_ap4220_sw_gpio_qfn,
-		.sw_gpio_count = ARRAY_SIZE(ap_dk01_ap4220_sw_gpio_qfn),
+		.sw_gpio = ap_dk01_1_c2_sw_gpio_qfn,
+		.sw_gpio_count = ARRAY_SIZE(ap_dk01_1_c2_sw_gpio_qfn),
 		.edma_cfg = {
 			ipq40xx_edma_cfg(0, 5, PSGMII,
 					0, 1, 2, 3, 4)
@@ -1763,8 +1763,8 @@ board_ipq40xx_params_t board_params[] = {
 		.ddr_size = (256 << 20),
 		.mtdids = "nand1=nand1,nand2=spi0.0",
 		.console_uart_cfg = &uart1_console_uart_dk01,
-		.sw_gpio = ap_dk01_1_c2_sw_gpio_qfn,
-		.sw_gpio_count = ARRAY_SIZE(ap_dk01_1_c2_sw_gpio_qfn),
+		.sw_gpio = AP_DK01_AP4220_sw_gpio_qfn,
+		.sw_gpio_count = ARRAY_SIZE(AP_DK01_AP4220_sw_gpio_qfn),
 		.edma_cfg = {
 			ipq40xx_edma_cfg(0, 5, PSGMII,
 					0, 1, 2, 3, 4)
