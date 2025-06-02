@@ -50,7 +50,8 @@
 							</select>
 						</div>
 						<div class="form-group">
-							<input type="text" id="mac-address" class="form-control" maxlength="12" pattern="[0-9a-fA-F]{12}" placeholder="输入12位十六进制字符">
+							<input type="text" id="mac-address" class="form-control" 
+								placeholder="格式: aa:bb:cc:dd:ee:ff 或 aa-bb-cc-dd-ee-ff 或 aabbccddeeff">
 						</div>
 					</div>
 					<button class="submit-btn" id="mac-submit" type="button">执行操作</button>
@@ -60,7 +61,7 @@
 				</div>
 				<div class="notice-box">
 					<div class="notice-text">
-						<p>• MAC地址格式支持12位连续字符(例如a0b1c2d3e4f5);</p>
+						<p>• MAC地址格式支持12位连续字符(例如a0b1c2d3e4f5或a0:b1:c2:d3:e4:f5或a0-b1-c2-d3-e4-f5);</p>
 						<p>• 修改无线MAC地址会自动校验并更新校验和数值；</p>
 						<p>• 若操作后无线速率异常，请重刷原厂ART并重新设置MAC地址，或者保持原厂默认MAC地址。</p>
 					</div>
@@ -72,13 +73,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 	const dom = {
 		actionType: document.getElementById('action-type'),
-		macInput: document.getElementById('mac-input'),
 		macSubmit: document.getElementById('mac-submit'),
 		resultBox: document.getElementById('mac-result'),
 		macAddress: document.getElementById('mac-address'),
 		iface: document.getElementById('interface')
 	};
-
 	// 保证 result-content 始终存在
 	function getResultContent() {
 		let result = dom.resultBox.querySelector('.result-content');
@@ -90,36 +89,56 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		return result;
 	}
-
-	dom.macAddress.addEventListener('input', e => {
-		e.target.value = e.target.value
-			.replace(/[^a-fA-F0-9]/g, '')
-			.substring(0, 12)
-			.toLowerCase();
+	// 自动格式化MAC地址输入
+	dom.macAddress.addEventListener('input', function(e) {
+		let value = e.target.value.replace(/[^a-fA-F0-9: -]/g, '');
+		let cursorPos = e.target.selectionStart;
+		// 移除所有非字母数字字符
+		let cleanValue = value.replace(/[^a-fA-F0-9]/g, '');
+		// 如果长度超过12，截断
+		if (cleanValue.length > 12) {
+			cleanValue = cleanValue.substring(0, 12);
+		}
+		// 自动添加分隔符（用户输入第2、4、6、8、10个字符时）
+		let formattedValue = '';
+		for (let i = 0; i < cleanValue.length; i++) {
+			if (i > 0 && (i % 2 === 0) && i < 10) {
+				// 检测用户是否输入了分隔符
+				if (value.length > cursorPos - 1 && (value[cursorPos - 1] === ':' || value[cursorPos - 1] === '-')) {
+					formattedValue += value[cursorPos - 1]; // 保留用户输入的分隔符
+				} else {
+					formattedValue += ':'; // 默认使用冒号
+				}
+			}
+			formattedValue += cleanValue[i];
+		}
+		e.target.value = formattedValue.toLowerCase();
+		// 恢复光标位置
+		let newCursorPos = cursorPos;
+		if (formattedValue.length > value.length) {
+			newCursorPos += formattedValue.length - value.length;
+		}
+		e.target.setSelectionRange(newCursorPos, newCursorPos);
 	});
-
 	dom.macSubmit.addEventListener('click', () => {
 		const result = getResultContent();
 		dom.resultBox.className = '';
 		result.className = 'result-content';
 		result.innerHTML = '';
-
 		const action = dom.actionType.value;
 		const iface = dom.iface.value;
-		const mac = dom.macAddress.value.trim();
-
+		let mac = dom.macAddress.value.trim();
+		// 清理MAC地址格式（移除所有非字母数字字符）
+		mac = mac.replace(/[^a-fA-F0-9]/g, '');
 		if (action === 'write' && mac.length !== 12) {
 			dom.resultBox.className = 'error';
 			result.innerHTML = '<div style="text-align: center">错误：MAC地址格式无效</div>';
 			return;
 		}
-
 		dom.resultBox.className = '';
 		result.innerHTML = '处理中...';
-
 		let params = 'action=' + encodeURIComponent(action) + '&iface=' + encodeURIComponent(iface);
 		if (action === 'write') params += '&mac=' + encodeURIComponent(mac);
-
 		fetch('/macrw', {
 			method: 'POST',
 			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -130,11 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				dom.resultBox.className = 'success';
 				result.innerHTML = '<div style="text-align:center">' + txt + '</div>';
 
-				// 若为读取操作，自动填充MAC地址
+				// 若为读取操作，自动填充MAC地址（带冒号分隔符）
 				if (action === 'read') {
-					const match = txt.match(/([0-9a-fA-F]{12})/i);
+					const match = txt.match(/([0-9a-fA-F]{2}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/i);
 					if (match) {
-						dom.macAddress.value = match[1].toLowerCase();
+						dom.macAddress.value = match[0].toLowerCase();
 					}
 				}
 			} else {
