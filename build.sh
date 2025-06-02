@@ -90,7 +90,8 @@ build_board() {
 
 	echo -e "${GREEN}✅ 编译完成: $(basename "$out_elf")${RESET}" | tee -a "$LOGFILE"
 	echo -e "${GREEN}✅ 生成校验: $(basename "$out_elf").md5${RESET}" | tee -a "$LOGFILE"
-	echo -e "${GREEN}✅ 生成镜像:  $(basename "$out_bin") 和 $(basename "$out_bin").md5${RESET}" | tee -a "$LOGFILE"
+	echo -e "${GREEN}✅ 生成镜像: $(basename "$out_bin")${RESET}" | tee -a "$LOGFILE"
+	echo -e "${GREEN}✅ 生成校验: $(basename "$out_bin").md5${RESET}" | tee -a "$LOGFILE"
 
 	sed -r 's/\x1B\[[0-9;]*[a-zA-Z]//g; s/[[:cntrl:]]//g; s/[^[:print:]\t]//g' build.log > build.clean.log
 
@@ -115,7 +116,7 @@ build_board() {
 	echo -e "  ➤ BIN 镜像:       $(basename "$out_bin")"
 	echo -e "      大小:         ${binsize}"
 	echo -e "      MD5:          ${binmd5}"
-	echo -e "  ➤ 打包文件:      $(basename "$zipfile")"
+	echo -e "  ➤ 打包文件:       $(basename "$zipfile")"
 	echo -e "      大小:         ${zipsize}"
 	echo -e "      路径:         ${zipfile}"
 	echo -e "      MD5:          ${zipmd5}"
