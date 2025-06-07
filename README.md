@@ -12,25 +12,31 @@ git clone https://github.com/1980490718/openwrt-sdk-ipq806x-qsdk53
 ```
 make
 ```
-或者
-修改顶层的build.sh中的第47行的STAGING_DIR，指向openwrt-sdk-ipq806x/staging_dir，然后执行：
+或者修改顶层的build.sh中的第47行的STAGING_DIR，指向openwrt-sdk-ipq806x/staging_dir，然后执行：
 ```
 ./build.sh cdp
 ```
-或者
-````
+或者：
+```
 ./build.sh ap4220
 ```
-make生成的uboot为：
-bin/openwrt-ipq40xx-u-boot-stripped.elf
+## 生成关系
+```
+make
+```
+生成的uboot为：bin/openwrt-ipq40xx-u-boot-stripped.elf
 
-./build.sh cdp生成的uboot为：
+```
+./build.sh cdp
+```
 
-bin/openwrt-cdp-u-boot-stripped.elf
+生成的uboot为：bin/openwrt-cdp-u-boot-stripped.elf
 
-./build.sh ap4220生成的uboot为：
+```
+./build.sh ap4220
+```
 
-bin/openwrt-ap4220-u-boot-stripped.elf
+生成的uboot为：bin/openwrt-ap4220-u-boot-stripped.elf
 
 ## web升级
 
