@@ -2,11 +2,34 @@
  * SPDX-License-Identifier:GPL-2.0-or-later
 */
 
-#ifndef _IPQ40XX_AP4220_H
-#define _IPQ40XX_AP4220_H
+#ifndef _IPQ40XX_AP_DK01_1_C2
+#define _IPQ40XX_AP_DK01_1_C2
 
 #include <configs/ipq40xx_cdp.h>
 #include <ipq40xx_api.h>
+
+#define CONFIG_QCA_MMC
+
+#ifdef CONFIG_QCA_MMC
+#define CONFIG_CMD_MMC
+#define CONFIG_MMC
+#define CONFIG_EFI_PARTITION
+#define CONFIG_GENERIC_MMC
+#define CONFIG_ENV_IS_IN_MMC
+#define CONFIG_SYS_MMC_ENV_DEV  0
+#endif
+
+#define CONFIG_IPQ40XX_PCI
+#ifdef CONFIG_IPQ40XX_PCI
+#define CONFIG_PCI
+#define CONFIG_CMD_PCI
+#define CONFIG_PCI_SCAN_SHOW
+#endif
+
+#define MTDPARTS_DEFAULT	"mtdparts=nand2:0x1E40000@0x1C0000(firmware)"
+#define MTDIDS_DEFAULT		"nand2=nand2"
+
+#define CONFIG_FACTORY_IMG_FILENAME    "habanero.bin"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"active=1\0" \
@@ -64,4 +87,4 @@
 	"ub_file=openwrt-ap4220-u-boot-stripped.elf\0" \
 	"upgrade_available=1\0"
 
-#endif /* _IPQ40XX_AP4220_H */
+#endif /* _IPQ40XX_AP_DK01_1_C2 */
