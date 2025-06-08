@@ -21,7 +21,7 @@
 
 #define CONFIG_IPQ40XX_PCI
 #ifdef CONFIG_IPQ40XX_PCI
-#define CONFIG_PCI
+
 #define CONFIG_CMD_PCI
 #define CONFIG_PCI_SCAN_SHOW
 #endif
