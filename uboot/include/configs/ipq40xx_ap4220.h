@@ -22,8 +22,7 @@
 #define CONFIG_IPQ40XX_PCI
 #ifdef CONFIG_IPQ40XX_PCI
 
-#define CONFIG_CMD_PCI
-#define CONFIG_PCI_SCAN_SHOW
+
 #endif
 
 #define MTDPARTS_DEFAULT	"mtdparts=nand2:0x1E40000@0x1C0000(firmware)"
