@@ -19,11 +19,6 @@
 #define CONFIG_SYS_MMC_ENV_DEV  0
 #endif
 
-#define CONFIG_IPQ40XX_PCI
-#ifdef CONFIG_IPQ40XX_PCI
-
-
-#endif
 
 #define MTDPARTS_DEFAULT	"mtdparts=nand2:0x1E40000@0x1C0000(firmware)"
 #define MTDIDS_DEFAULT		"nand2=nand2"
