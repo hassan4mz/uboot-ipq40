@@ -308,7 +308,6 @@ typedef struct {
 #define CONFIG_LZMA
 #define CONFIG_QCOM_WATCHDOG
 #define CONFIG_CMD_MISC
-#define CONFIG_CMD_BOOTD
 
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
