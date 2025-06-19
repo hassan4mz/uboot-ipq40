@@ -61,8 +61,8 @@ int upgrade(void) {
 						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start);
 					break;
 					
-				case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 				case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+				case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 					snprintf(cmd, sizeof(cmd),
 						"nand device 1 && nand erase 0x%x 0x%x && nand write 0x88000000 0x%x $filesize",
 						openwrt_firmware_start, openwrt_firmware_size, openwrt_firmware_start);
@@ -94,11 +94,11 @@ void LED_INIT(void) {
 			gpio_set_value(GPIO_B1300_MESH_LED, 0);
 			gpio_set_value(GPIO_B1300_WIFI_LED, 0);
 			break;
-		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 			gpio_set_value(GPIO_AP1300_POWER_LED, 1);
 			gpio_set_value(GPIO_AP1300_INET_LED, 0);
 			break;
-		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 			gpio_set_value(GPIO_AP4220_POWER_LED, 0);
 			gpio_set_value(GPIO_AP4220_2GWIFI_LED, 1);
 			gpio_set_value(GPIO_AP4220_5GWIFI_LED, 0);
@@ -120,11 +120,11 @@ void LED_INIT(void) {
 
 void LED_BOOTING(void) {
 	switch (gboard_param->machid) {
-		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 			gpio_set_value(GPIO_AP1300_POWER_LED, 1);
 			gpio_set_value(GPIO_AP1300_INET_LED, 0);
 			break;
-		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 			gpio_set_value(GPIO_AP4220_POWER_LED, 0);
 			gpio_set_value(GPIO_AP4220_2GWIFI_LED, 1);
 			gpio_set_value(GPIO_AP4220_5GWIFI_LED, 0);
@@ -172,7 +172,7 @@ void board_names_init()
 		power_led_active_low=0;
 		get_mmc_part_info();
 		break;
-	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 		openwrt_firmware_start=0x0;
 		openwrt_firmware_size=0x8000000;
 		power_led=GPIO_AP1300_POWER_LED;
@@ -182,7 +182,7 @@ void board_names_init()
 		led_upgrade_erase_flashing=GPIO_AP1300_POWER_LED;
 		flashing_power_led=1;
 		break;
-	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 		openwrt_firmware_start=0x0;
 		openwrt_firmware_size=0x8000000;
 		power_led=GPIO_AP4220_POWER_LED;
