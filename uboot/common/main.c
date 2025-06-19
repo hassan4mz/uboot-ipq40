@@ -418,8 +418,8 @@ void main_loop (void)
 		gpio_reset_btn=40;
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
-	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 		gpio_reset_btn=63;
 		break;
 	default:
@@ -442,10 +442,10 @@ void main_loop (void)
 		case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
 			gpio_set_value(GPIO_B1300_WIFI_LED, 1);
 			break;
-		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 			gpio_set_value(GPIO_AP1300_POWER_LED, 1);
 			break;
-		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 			gpio_set_value(GPIO_AP4220_POWER_LED, 1);
 			break;
 		default:
@@ -463,7 +463,7 @@ void main_loop (void)
 		case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
 			gpio_set_value(GPIO_B1300_WIFI_LED, 0);
 			break;
-		case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+		case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 			gpio_set_value(GPIO_AP1300_POWER_LED, 0);
 			break;
 		default:
@@ -499,10 +499,10 @@ void main_loop (void)
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
 		gpio_set_value(GPIO_B1300_MESH_LED, 1);
 		break;
-	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
+	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
 		gpio_set_value(GPIO_AP1300_POWER_LED, 1);
 		break;
-	case MACH_TYPE_IPQ40XX_AP_DK01_AP4220:
+	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 		gpio_set_value(GPIO_AP4220_POWER_LED, 1);
 		break;
 	default:
@@ -516,7 +516,7 @@ void main_loop (void)
 		printf( "\n\nCaution: reset button wasn't held long enough!\nContinuing normal boot...\n\n" );
 	} else {
 	}
-	if(gboard_param->machid==MACH_TYPE_IPQ40XX_AP_DK01_1_C2)
+	if(gboard_param->machid==MACH_TYPE_IPQ40XX_AP_DK01_AP4220)
 		gpio_set_value(GPIO_AP1300_POWER_LED, 1);
 # endif
 	if (bootdelay >= 0 && s && !abortboot (bootdelay)) {
